@@ -1,0 +1,13 @@
+#!/bin/bash
+# Mock claude command for testing
+
+echo "=== MOCK CLAUDE CALLED ==="
+echo "Current directory: $PWD"
+echo "Arguments: $@"
+echo "Argument count: $#"
+echo ""
+echo "Individual arguments:"
+for i in "$@"; do
+    echo "  - '$i'"
+done
+echo "=========================="

@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Test 02: Relative path works
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
+
+TEST_ROOT="$SCRIPT_DIR"
+mkdir -p "$TEST_ROOT/parent/valid_v1_01"
+
+cat > "$TEST_ROOT/parent/cellproject.toml" << 'EOF'
+[project]
+name = "test"
+EOF
+
+cat > "$TEST_ROOT/parent/valid_v1_01/CELL.md" << 'EOF'
+---
+work_complete: true
+---
+
+# DISCOVERY
+Test.
+
+# ABSTRACT
+Test.
+
+# FULL_RATIONALE
+Test.
+
+# FULL_IMPLEMENTATION
+Test.
+
+# LOG
+- 2025-01-01T00:00:00Z: Created
+EOF
+
+cd "$TEST_ROOT"
+set +e
+output=$("$CELL_VALIDATE" parent/valid_v1_01 2>&1)
+exit_code=$?
+set -e
+
+if [ $exit_code -ne 0 ]; then
+    echo "✗ Expected exit code 0, got $exit_code"
+    cd "$REPO_ROOT"
+    rm -rf "$TEST_ROOT/parent"
+    exit 1
+fi
+
+cd "$REPO_ROOT"
+rm -rf "$TEST_ROOT/parent"
+
+echo "✓ Relative path works"
+exit 0

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test 01: @root without cellproject.toml produces error
+# Test 01: @project without projectroot.toml produces error
 # NOTE: This test currently documents a bug in the implementation.
 # The implementation incorrectly validates "/" instead of returning an error.
 # TODO: Fix implementation and update this test
@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 
-# Create test in /tmp to avoid finding the repo's cellproject.toml
+# Create test in /tmp to avoid finding the repo's projectroot.toml
 TEST_ROOT="/tmp/cell_validate_test_014_$$"
 mkdir -p "$TEST_ROOT/no_project/test_v1_01"
 
@@ -38,12 +38,12 @@ EOF
 
 cd "$TEST_ROOT/no_project/test_v1_01"
 set +e
-output=$("$CELL_VALIDATE" @root 2>&1)
+output=$("$CELL_VALIDATE" @project 2>&1)
 exit_code=$?
 set -e
 
 # CURRENT BUGGY BEHAVIOR: Validates "/" instead of erroring
-# Expected: exit_code == 1 AND output contains "Error: No cellproject.toml found..."
+# Expected: exit_code == 1 AND output contains "Error: No projectroot.toml found..."
 # Actual: exit_code == 1 BUT output shows validation errors for "/"
 
 if [ $exit_code -ne 1 ]; then
@@ -54,7 +54,7 @@ if [ $exit_code -ne 1 ]; then
 fi
 
 # Accept either the correct behavior OR the current buggy behavior
-if echo "$output" | grep -q "Error: No cellproject.toml found in directory hierarchy"; then
+if echo "$output" | grep -q "Error: No projectroot.toml found in directory hierarchy"; then
     # Correct behavior - implementation fixed!
     :
 elif echo "$output" | grep -q "✗ / -"; then
@@ -72,5 +72,5 @@ fi
 cd "$REPO_ROOT"
 rm -rf "$TEST_ROOT"
 
-echo "✓ @root without cellproject.toml produces error (documents current behavior)"
+echo "✓ @project without projectroot.toml produces error (documents current behavior)"
 exit 0

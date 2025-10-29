@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test 01: Basic @root expansion from subdirectory
+# Test 01: Basic @project expansion from subdirectory
 
 set -e
 
@@ -12,15 +12,15 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/execution/subdir"
 
-# Create cellproject.toml
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+# Create projectroot.toml
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
 
 # Run cell expand from subdirectory
 cd "$TEST_ROOT/execution/subdir"
-output=$("$CELL_EXPAND" @root 2>&1)
+output=$("$CELL_EXPAND" @project 2>&1)
 exit_code=$?
 
 # Verify exit code
@@ -44,5 +44,5 @@ fi
 cd "$REPO_ROOT"
 rm -rf "$TEST_ROOT"
 
-echo "✓ @root expands to correct project root path"
+echo "✓ @project expands to correct project root path"
 exit 0

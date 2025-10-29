@@ -11,7 +11,7 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/valid_v1_01"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -27,7 +27,7 @@ set -e
 if [ $exit_code -ne 1 ]; then
     echo "✗ Expected exit code 1, got $exit_code"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/cellproject.toml"
+    rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/projectroot.toml"
     exit 1
 fi
 
@@ -35,12 +35,12 @@ if ! echo "$output" | grep -q "Missing required file: CELL.md"; then
     echo "✗ Expected 'Missing required file: CELL.md' error not found"
     echo "  Output: $output"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/cellproject.toml"
+    rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/projectroot.toml"
     exit 1
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Directory without CELL.md fails validation"
 exit 0

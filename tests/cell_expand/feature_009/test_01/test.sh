@@ -26,8 +26,8 @@ if ! echo "$output" | grep -q "Usage:"; then
     exit 1
 fi
 
-if ! echo "$output" | grep -q "@root"; then
-    echo "✗ Help text missing '@root' information"
+if ! echo "$output" | grep -q "@project"; then
+    echo "✗ Help text missing '@project' information"
     echo "  Output: $output"
     exit 1
 fi

@@ -69,11 +69,11 @@ When ABSTRACT is requested (alone or combined with DISCOVERY), full file must be
 
 # feature_006
 
-Command finds project root by walking up directory tree looking for `cellproject.toml` file.
+Command finds project root by walking up directory tree looking for `projectroot.toml` file.
 
-If not found after reaching filesystem root, exits with error code 1 and message: "No cellproject.toml found in directory hierarchy"
+If not found after reaching filesystem root, exits with error code 1 and message: "No projectroot.toml found in directory hierarchy"
 
-**Test**: Run `cell orient` from directory tree without `cellproject.toml`. Verify exits with error code 1 and correct error message. Run from directory with `cellproject.toml` in parent path and verify it finds root correctly.
+**Test**: Run `cell orient` from directory tree without `projectroot.toml`. Verify exits with error code 1 and correct error message. Run from directory with `projectroot.toml` in parent path and verify it finds root correctly.
 
 # feature_007
 
@@ -196,3 +196,42 @@ When ABSTRACT section contains multiple paragraphs separated by blank lines, pre
 Blank lines in ABSTRACT are preserved. All content between `# ABSTRACT` and next section heading is included.
 
 **Test**: Create CELL.md with ABSTRACT containing 3 paragraphs separated by blank lines. Run `cell orient --ABSTRACT .`. Verify output preserves paragraph breaks and shows all content.
+
+# feature_016
+
+Flag `--descendants` enables recursive nesting of children in `<children>` XML sections.
+
+Behavior:
+- `--children` shows immediate subordinate cells without nesting
+- `--descendants` shows ALL cells in the subtree with nested `<children>` sections
+- Each cell can have its own nested `<children>` containing its immediate children
+- This preserves hierarchical relationships (you can see which grandchild belongs to which child)
+- `--descendants` implies `--children`
+
+Output structure with `--descendants`:
+```xml
+<children>
+  <cell name="child_v1_01">
+    <children>
+      <cell name="grandchild_v1_01"/>
+    </children>
+  </cell>
+</children>
+```
+
+Not a flat list in separate `<descendants>` section.
+
+**Test**: Create hierarchy with multiple levels (parent → child → grandchild → great-grandchild). Run `cell orient --descendants .` from parent. Verify output shows nested `<children>` sections preserving hierarchy. Compare with `cell orient --children .` which shows only immediate children without nesting.
+
+# feature_017
+
+When `cell orient @project` is run and `treeroot.toml` exists (making `@tree` different from `@project`), command auto-corrects to use `@tree` instead and displays warning to stderr.
+
+Behavior:
+- If `@project` == `@tree` (no treeroot.toml): Uses project root, no warning
+- If `@project` != `@tree` (treeroot.toml exists): Auto-corrects to `@tree`, shows warning
+- Warning message: "Warning: @project differs from @tree. Auto-correcting to @tree (use @project/path for explicit project root path)"
+- Warning goes to stderr, not stdout
+- `@project/explicit/path` always uses literal project root, no auto-correction
+
+**Test**: Create project structure with `projectroot.toml` at root and `treeroot.toml` in `work_cells/`. From deep work cell, run `cell orient @project`. Verify (1) command orients from `work_cells/` not project root, (2) warning appears on stderr, (3) `cell orient @project/work_cells` uses literal project root with no warning.

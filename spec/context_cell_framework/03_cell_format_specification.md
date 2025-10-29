@@ -62,9 +62,9 @@ ABSTRACT section is an information-dense summary: objectives, approach, expected
 Use specific metrics, concrete tech names, references, quantified results.
 Typically 5-10 sentences; fewer if trivial, more if complex.
 
-Should reference files using path conventions (`./_outputs/` for WORK_CELL_ROOT, `@root/` for CELL_PROJECT_ROOT), not embed data directly.
+Should reference files using path conventions (`@this/_outputs/` for CELL_ROOT, `@project/` for PROJECT_ROOT), not embed data directly.
 
-Example: "Built ML recommendation system using hybrid collaborative + content-based filtering achieving 18.1% precision@10 on 45k users. Implemented item-based k-NN with cosine similarity, weighted interactions (click=1, save=2, share=3). Dataset: 2.1M events July-Sept 2024 with 99.6% sparsity (see `./_outputs/dataset_stats.csv`). ~50ms response time, 85% Redis cache hit. Currently tuning hyperparameters targeting 20%+ precision@10."
+Example: "Built ML recommendation system using hybrid collaborative + content-based filtering achieving 18.1% precision@10 on 45k users. Implemented item-based k-NN with cosine similarity, weighted interactions (click=1, save=2, share=3). Dataset: 2.1M events July-Sept 2024 with 99.6% sparsity (see `@this/_outputs/dataset_stats.csv`). ~50ms response time, 85% Redis cache hit. Currently tuning hyperparameters targeting 20%+ precision@10."
 
 ## FULL_IMPLEMENTATION Section Requirements
 

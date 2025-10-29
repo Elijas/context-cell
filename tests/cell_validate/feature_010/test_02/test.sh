@@ -11,7 +11,7 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/Bad-Name"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -34,7 +34,7 @@ set -e
 if [ $exit_code -ne 1 ]; then
     echo "✗ Expected exit code 1, got $exit_code"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/Bad-Name" "$TEST_ROOT/cellproject.toml"
+    rm -rf "$TEST_ROOT/Bad-Name" "$TEST_ROOT/projectroot.toml"
     exit 1
 fi
 
@@ -44,12 +44,12 @@ if [ "$error_count" -lt 2 ]; then
     echo "✗ Expected multiple errors, got $error_count"
     echo "  Output: $output"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/Bad-Name" "$TEST_ROOT/cellproject.toml"
+    rm -rf "$TEST_ROOT/Bad-Name" "$TEST_ROOT/projectroot.toml"
     exit 1
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/Bad-Name" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/Bad-Name" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Many errors reported correctly"
 exit 0

@@ -19,9 +19,9 @@ tests/cell_validate/
 ├── feature_009/    # DISCOVERY beyond line 12
 ├── feature_010/    # Multiple errors reported
 ├── feature_011/    # Path argument support
-├── feature_012/    # @root path support
+├── feature_012/    # @project path support
 ├── feature_013/    # Invalid path error
-├── feature_014/    # No cellproject.toml error
+├── feature_014/    # No projectroot.toml error
 └── feature_015/    # Missing path argument error
 ```
 
@@ -50,7 +50,7 @@ Tests validate:
 - ✓ DISCOVERY position (within 12 lines)
 - ✓ Multiple error reporting
 - ✓ Path argument handling
-- ✓ @root path support
+- ✓ @project path support
 - ✓ Error handling for invalid inputs
 
 ## Writing New Tests

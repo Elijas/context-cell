@@ -80,7 +80,7 @@ Every command needs:
 - Required parameters (explicit about what's mandatory)
 - Optional parameters (with defaults)
 - Usage examples (common patterns)
-- Path symbol support (`@root`, `.`)
+- Path symbol support (`@project`, `.`)
 
 ## Common Pitfalls
 
@@ -90,8 +90,8 @@ Every command needs:
 ❌ **Ambiguous**: "Update your work cell"
 ✅ **Explicit**: "Update CELL.md sections and set work_complete: true when done"
 
-❌ **Missing context**: "Use @root for paths"
-✅ **Complete**: "Use `@root/path/to/file` for CELL_PROJECT_ROOT paths. Never use bare paths like `path/to/file`."
+❌ **Missing context**: "Use @project for paths"
+✅ **Complete**: "Use `@project/path/to/file` for PROJECT_ROOT paths. Never use bare paths like `path/to/file`."
 
 ## Why This Matters
 

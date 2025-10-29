@@ -12,8 +12,8 @@ CELL_ORIENT="$REPO_ROOT/bin/_cell_orient.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution/auth_v1_01"
 
-# Create cellproject.toml
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+# Create projectroot.toml
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -88,7 +88,7 @@ fi
 
 # Cleanup
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Combined --DISCOVERY --ABSTRACT flags work correctly"
 exit 0

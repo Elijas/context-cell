@@ -3,13 +3,13 @@
 # cell orient - View work cell hierarchy with configurable sections
 # Shows vantage-based view: Ancestry → Peers → Children in XML format
 
-# Function to find cellproject.toml by walking up directory tree
+# Function to find projectroot.toml by walking up directory tree
 find_project_root() {
     local current_dir="$1"
 
     # Walk up the directory tree
     while [ "$current_dir" != "/" ]; do
-        if [ -f "$current_dir/cellproject.toml" ]; then
+        if [ -f "$current_dir/projectroot.toml" ]; then
             echo "$current_dir"
             return 0
         fi
@@ -17,12 +17,38 @@ find_project_root() {
     done
 
     # Check root directory as well
-    if [ -f "/cellproject.toml" ]; then
+    if [ -f "/projectroot.toml" ]; then
         echo "/"
         return 0
     fi
 
     return 1
+}
+
+# Function to find treeroot.toml by walking up directory tree
+# Falls back to project root if not found
+find_work_root() {
+    local current_dir="$1"
+    local project_root="$2"
+
+    # Walk up the directory tree
+    while [ "$current_dir" != "/" ]; do
+        if [ -f "$current_dir/treeroot.toml" ]; then
+            echo "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+
+    # Check root directory as well
+    if [ -f "/treeroot.toml" ]; then
+        echo "/"
+        return 0
+    fi
+
+    # Fall back to project root if treeroot.toml not found
+    echo "$project_root"
+    return 0
 }
 
 # Function to find execution boundary
@@ -117,10 +143,11 @@ extract_abstract() {
     local cell_md="$cell_path/CELL.md"
 
     # Extract everything between # ABSTRACT and the next # heading
+    # Preserve blank lines for paragraph structure
     local abstract=$(awk '
         /^# ABSTRACT$/ { in_abstract=1; next }
         in_abstract && /^# [A-Z]/ { exit }
-        in_abstract && NF > 0 { print }
+        in_abstract { print }
     ' "$cell_md")
 
     echo "$abstract"
@@ -201,11 +228,13 @@ get_peers() {
     printf '%s\n' "${peers[@]}" | sort
 }
 
-# Convert absolute path to relative path from project root with @root prefix
+
+# Convert absolute path to relative path with @project/@tree prefix
 make_relative_path() {
     local abs_path="$1"
     local project_root="$2"
     local target_path="$3"
+    local work_root="$4"
 
     # If path is the target_path, use .
     if [ "$abs_path" = "$target_path" ]; then
@@ -220,9 +249,22 @@ make_relative_path() {
         return
     fi
 
-    # Otherwise use @root
+    # If work_root != project_root and path is under work_root, use @tree
+    if [ "$work_root" != "$project_root" ] && [[ "$abs_path" == "$work_root"/* ]]; then
+        local rel="${abs_path#$work_root/}"
+        echo "@tree/${rel}/CELL.md"
+        return
+    fi
+
+    # If path IS work_root and work_root != project_root, use @tree
+    if [ "$work_root" != "$project_root" ] && [ "$abs_path" = "$work_root" ]; then
+        echo "@tree/CELL.md"
+        return
+    fi
+
+    # Otherwise use @project
     local rel="${abs_path#$project_root/}"
-    echo "@root/${rel}/CELL.md"
+    echo "@project/${rel}/CELL.md"
 }
 
 # Print a cell in XML format
@@ -233,10 +275,12 @@ print_cell() {
     local project_root="$4"
     local target_path="$5"
     local indent="$6"
+    local recursive="$7"  # Whether to recursively print children
+    local work_root="$8"  # Work root for path resolution
 
     local cell_name="$(basename "$cell_path")"
     local status=$(get_work_complete_status "$cell_path")
-    local rel_path=$(make_relative_path "$cell_path" "$project_root" "$target_path")
+    local rel_path=$(make_relative_path "$cell_path" "$project_root" "$target_path" "$work_root")
 
     # Escape for XML
     local escaped_name=$(xml_escape "$cell_name")
@@ -263,6 +307,22 @@ print_cell() {
         echo "${indent}  </abstract>"
     fi
 
+    # Recursively print children if requested
+    if [ "$recursive" = true ]; then
+        local children=()
+        while IFS= read -r line; do
+            [ -n "$line" ] && children+=("$line")
+        done < <(get_children "$cell_path" | sort)
+
+        if [ ${#children[@]} -gt 0 ]; then
+            echo "${indent}  <children>"
+            for child in "${children[@]}"; do
+                print_cell "$child" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "${indent}    " "$recursive" "$work_root"
+            done
+            echo "${indent}  </children>"
+        fi
+    fi
+
     # Close cell tag
     echo "${indent}</cell>"
 }
@@ -285,13 +345,20 @@ RELATIONSHIP FLAGS (which cells to show):
   --ancestors, -a          Include parent cells up to execution boundary
   --peers, -p              Include sibling cells at same level
   --children, -c           Include immediate child cells
+  --descendants, -d        Include all descendant cells recursively
 
   Default (no flags): all except --self (full vantage view)
 
   Can be combined: -s -c includes both current cell and its children
+  Note: --descendants includes ALL children recursively (--children shows only immediate)
 
 PATH (required):
-  Directory to orient from (use . for current directory)
+  Directory to orient from. Special values:
+    .                  Current directory
+    @project           Project root (projectroot.toml location)
+    @project/subpath   Path from project root
+    @tree              Work cells root (treeroot.toml location)
+    @tree/subpath      Path from work root
 
 EXAMPLES:
   cell orient .                              # Quick overview from current location
@@ -302,10 +369,12 @@ EXAMPLES:
   cell orient --peers .                      # Include only siblings
   cell orient --ancestors --children other/  # Include ancestry and children from other/
   cell orient -sac .                         # Include self, ancestors, and children
+  cell orient --descendants .                # Include all descendants recursively
+  cell orient --descendants --ABSTRACT .     # Full descendant tree with abstracts
 
 EXIT CODES:
   0 - Success (even if no cells found)
-  1 - Error (no cellproject.toml, invalid path, missing path argument, etc.)
+  1 - Error (no projectroot.toml, invalid path, missing path argument, etc.)
 EOF
   exit 0
 }
@@ -319,6 +388,7 @@ main() {
     local show_ancestors=false
     local show_peers=false
     local show_children=false
+    local show_descendants=false
     local path_arg=""
     local section_flags_set=false
     local relationship_flags_set=false
@@ -359,6 +429,11 @@ main() {
                 relationship_flags_set=true
                 shift
                 ;;
+            --descendants|-d)
+                show_descendants=true
+                relationship_flags_set=true
+                shift
+                ;;
             -*)
                 echo "Error: Unknown option: $1" >&2
                 echo "Use --help for usage information" >&2
@@ -384,30 +459,54 @@ main() {
         show_discovery=true
     fi
 
+    # Handle descendants flag: implies show_children
+    if [ "$show_descendants" = true ]; then
+        show_children=true
+    fi
+
     if [ "$relationship_flags_set" = false ]; then
         show_ancestors=true
         show_peers=true
         show_children=true
     fi
 
-    # Handle @root symbol: expand to project root before validating path
-    if [ "$path_arg" = "@root" ]; then
-        # Find project root from current directory
-        local temp_root=$(find_project_root "$(pwd)")
+    # Handle @project and @tree symbols
+    if [ "$path_arg" = "@project" ]; then
+        # Use project root
+        local temp_project_root=$(find_project_root "$(pwd)")
         if [ $? -ne 0 ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
-        path_arg="$temp_root"
-    elif [[ "$path_arg" == @root/* ]]; then
-        # Handle @root/subpath syntax
+        path_arg="$temp_project_root"
+    elif [[ "$path_arg" == @project/* ]]; then
+        # Handle @project/subpath syntax - use literal project root
         local temp_root=$(find_project_root "$(pwd)")
         if [ $? -ne 0 ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
-        # Replace @root with actual root path
-        path_arg="${temp_root}/${path_arg#@root/}"
+        # Replace @project with actual root path
+        path_arg="${temp_root}/${path_arg#@project/}"
+    elif [ "$path_arg" = "@tree" ]; then
+        # @tree: use work root (treeroot.toml location, or project root if not found)
+        local temp_project_root=$(find_project_root "$(pwd)")
+        if [ $? -ne 0 ]; then
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            exit 1
+        fi
+        local temp_work_root=$(find_work_root "$(pwd)" "$temp_project_root")
+        path_arg="$temp_work_root"
+    elif [[ "$path_arg" == @tree/* ]]; then
+        # Handle @tree/subpath syntax - use literal work root
+        local temp_project_root=$(find_project_root "$(pwd)")
+        if [ $? -ne 0 ]; then
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            exit 1
+        fi
+        local temp_work_root=$(find_work_root "$(pwd)" "$temp_project_root")
+        # Replace @tree with actual work root path
+        path_arg="${temp_work_root}/${path_arg#@tree/}"
     fi
 
     # Resolve path to absolute
@@ -421,9 +520,12 @@ main() {
     # Find project root
     local project_root=$(find_project_root "$target_path")
     if [ $? -ne 0 ]; then
-        echo "Error: No cellproject.toml found in directory hierarchy" >&2
+        echo "Error: No projectroot.toml found in directory hierarchy" >&2
         exit 1
     fi
+
+    # Find work root (falls back to project root if treeroot.toml not found)
+    local work_root=$(find_work_root "$target_path" "$project_root")
 
     # Verify path is within project
     if [[ ! "$target_path" =~ ^"$project_root" ]]; then
@@ -507,21 +609,25 @@ main() {
     # Compute relative path for display
     local display_path
     if [ "$target_path" = "$project_root" ]; then
-        display_path="@root"
+        display_path="@project"
     elif [[ "$target_path" == "$project_root"/* ]]; then
-        display_path="@root/${target_path#$project_root/}"
+        display_path="@project/${target_path#$project_root/}"
     else
         display_path="$target_path"
     fi
 
     # Print XML output
-    echo "<orient path=\"$(xml_escape "$display_path")\" expanded=\"$(xml_escape "$target_path")\" root=\"@root → $(xml_escape "$project_root")\">"
+    local root_attr="@project → $(xml_escape "$project_root")"
+    if [ "$work_root" != "$project_root" ]; then
+        root_attr="${root_attr}, @tree → $(xml_escape "$work_root")"
+    fi
+    echo "<orient path=\"$(xml_escape "$display_path")\" expanded=\"$(xml_escape "$target_path")\" root=\"${root_attr}\">"
     echo ""
 
     # Print sections
     if [ -n "$self_cell" ] && [ "$show_self" = true ]; then
         echo "  <self>"
-        print_cell "$self_cell" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    "
+        print_cell "$self_cell" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    " "false" "$work_root"
         echo "  </self>"
         echo ""
     fi
@@ -529,7 +635,7 @@ main() {
     if [ ${#ancestors[@]} -gt 0 ] && [ "$show_ancestors" = true ]; then
         echo "  <ancestry>"
         for ancestor in "${ancestors[@]}"; do
-            print_cell "$ancestor" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    "
+            print_cell "$ancestor" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    " "false" "$work_root"
         done
         echo "  </ancestry>"
         echo ""
@@ -538,7 +644,7 @@ main() {
     if [ ${#peers[@]} -gt 0 ] && [ "$show_peers" = true ]; then
         echo "  <peers>"
         for peer in "${peers[@]}"; do
-            print_cell "$peer" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    "
+            print_cell "$peer" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    " "false" "$work_root"
         done
         echo "  </peers>"
         echo ""
@@ -547,7 +653,8 @@ main() {
     if [ ${#children[@]} -gt 0 ] && [ "$show_children" = true ]; then
         echo "  <children>"
         for child in "${children[@]}"; do
-            print_cell "$child" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    "
+            # Pass show_descendants as recursive flag to enable nested children
+            print_cell "$child" "$show_discovery" "$show_abstract" "$project_root" "$target_path" "    " "$show_descendants" "$work_root"
         done
         echo "  </children>"
     fi

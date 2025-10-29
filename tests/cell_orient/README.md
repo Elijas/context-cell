@@ -13,7 +13,7 @@ tests/cell_orient/
 ├── feature_003/    # Combining section flags (--DISCOVERY --ABSTRACT)
 ├── feature_004/    # Relationship flags (--ancestors, --peers, --children)
 ├── feature_005/    # DISCOVERY optimization (first 12 lines)
-├── feature_006/    # Project root detection (cellproject.toml)
+├── feature_006/    # Project root detection (projectroot.toml)
 ├── feature_007/    # Execution boundary detection
 ├── feature_008/    # Invalid cells are ignored
 ├── feature_009/    # Empty output handling
@@ -21,7 +21,9 @@ tests/cell_orient/
 ├── feature_011/    # work_complete status indicators
 ├── feature_012/    # Help flag
 ├── feature_013/    # Section extraction correctness
-└── feature_014/    # Output formatting
+├── feature_014/    # Output formatting
+├── feature_015/    # ABSTRACT paragraph preservation
+└── feature_016/    # --descendants flag (recursive subtree)
 ```
 
 ## Running Tests
@@ -67,7 +69,7 @@ bash -x ./test.sh
 - **test_02**: DISCOVERY beyond line 12 causes cell to be ignored
 
 ### feature_006: Project root detection
-- **test_01**: Error when no cellproject.toml found in hierarchy
+- **test_01**: Error when no projectroot.toml found in hierarchy
 
 ### feature_007: Execution boundary
 - **test_01**: Ancestry stops at execution boundary
@@ -102,6 +104,13 @@ bash -x ./test.sh
 - **test_02**: Section headers formatted correctly (=== SECTION ===)
 - **test_03**: Empty sections are omitted
 
+### feature_015: ABSTRACT paragraph preservation
+- **test_01**: ABSTRACT preserves blank lines between paragraphs
+
+### feature_016: --descendants flag
+- **test_01**: Shows all descendants recursively (children, grandchildren, etc.), not just immediate children
+- **test_02**: Verifies proper nested hierarchical structure (not flat list), preserves parent-child relationships
+
 ## Writing New Tests
 
 Follow the template in existing test directories. Key principles:
@@ -129,7 +138,7 @@ TEST_ROOT="$SCRIPT_DIR"
 # Create test hierarchy
 mkdir -p "$TEST_ROOT/execution/cell_v1_01"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -150,7 +159,7 @@ fi
 
 # Cleanup
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Test description"
 exit 0

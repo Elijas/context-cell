@@ -29,5 +29,5 @@ if [ "$output" != "./foo/bar" ]; then
     exit 1
 fi
 
-echo "✓ Non-@root paths pass through unchanged"
+echo "✓ Non-@project paths pass through unchanged"
 exit 0

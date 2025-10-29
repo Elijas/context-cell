@@ -1,22 +1,22 @@
 # context
 
-`cell expand` expands `@root` path symbols to absolute paths.
+`cell expand` expands `@project` path symbols to absolute paths.
 
-The `@root` symbol expands to CELL_PROJECT_ROOT (the directory containing `cellproject.toml`).
+The `@project` symbol expands to PROJECT_ROOT (the directory containing `projectroot.toml`).
 
 Path formats:
-- `@root` → `/absolute/path/to/project/root`
-- `@root/subpath` → `/absolute/path/to/project/root/subpath`
+- `@project` → `/absolute/path/to/project/root`
+- `@project/subpath` → `/absolute/path/to/project/root/subpath`
 - `/absolute/path` → `/absolute/path` (unchanged)
 - `relative/path` → `relative/path` (unchanged)
 
-Paths without `@root` symbols pass through unchanged.
+Paths without `@project` symbols pass through unchanged.
 
 # context
 
-Project root is found by walking up directory tree from current directory looking for `cellproject.toml` file.
+Project root is found by walking up directory tree from current directory looking for `projectroot.toml` file.
 
-If `cellproject.toml` not found after reaching filesystem root (`/`), command exits with error code 1 and message: "No cellproject.toml found in directory hierarchy"
+If `projectroot.toml` not found after reaching filesystem root (`/`), command exits with error code 1 and message: "No projectroot.toml found in directory hierarchy"
 
 # context
 
@@ -26,14 +26,14 @@ Missing path argument causes exit code 1 with error message: "Missing PATH argum
 
 # context
 
-The `@root` symbol is consistent across all Context Cell commands and CELL.md file references:
-- `cell orient @root` - Orient from project root
-- `cell validate @root` - Validate project root
-- `cell expand @root/foo` - Expand path relative to root
-- File references in CELL.md: `@root/path/to/file.ext`
+The `@project` symbol is consistent across all Context Cell commands and CELL.md file references:
+- `cell orient @project` - Orient from project root
+- `cell validate @project` - Validate project root
+- `cell expand @project/foo` - Expand path relative to root
+- File references in CELL.md: `@project/path/to/file.ext`
 
 # context
 
 Exit codes:
 - `0` - Success (path expanded or passed through)
-- `1` - Error (missing path argument, or @root symbol used but no cellproject.toml found)
+- `1` - Error (missing path argument, or @project symbol used but no projectroot.toml found)

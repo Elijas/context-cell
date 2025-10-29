@@ -12,15 +12,15 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/subdir"
 
-# Create cellproject.toml
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+# Create projectroot.toml
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
 
 # Run cell expand with subpath
 cd "$TEST_ROOT/subdir"
-output=$("$CELL_EXPAND" @root/execution/cell_v1_01 2>&1)
+output=$("$CELL_EXPAND" @project/execution/cell_v1_01 2>&1)
 exit_code=$?
 
 # Verify exit code
@@ -32,7 +32,7 @@ if [ $exit_code -ne 0 ]; then
     exit 1
 fi
 
-# Verify output has @root expanded and subpath appended
+# Verify output has @project expanded and subpath appended
 expected="$TEST_ROOT/execution/cell_v1_01"
 if [ "$output" != "$expected" ]; then
     echo "✗ Expected $expected, got $output"
@@ -45,5 +45,5 @@ fi
 cd "$REPO_ROOT"
 rm -rf "$TEST_ROOT"
 
-echo "✓ @root/subpath expands correctly"
+echo "✓ @project/subpath expands correctly"
 exit 0

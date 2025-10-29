@@ -11,7 +11,7 @@ CELL_ORIENT="$REPO_ROOT/bin/_cell_orient.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution/auth_v1_01"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -56,7 +56,7 @@ if echo "$output" | grep -q "This is rationale content and should NOT be include
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ ABSTRACT extraction stops at next heading"
 exit 0

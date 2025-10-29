@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test 01: @root works from deeply nested directories
+# Test 01: @project works from deeply nested directories
 
 set -e
 
@@ -12,15 +12,15 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/a/b/c/d/e/f/g"
 
-# Create cellproject.toml at root
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+# Create projectroot.toml at root
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
 
 # Run cell expand from deepest subdirectory
 cd "$TEST_ROOT/a/b/c/d/e/f/g"
-output=$("$CELL_EXPAND" @root 2>&1)
+output=$("$CELL_EXPAND" @project 2>&1)
 exit_code=$?
 
 # Verify exit code
@@ -44,5 +44,5 @@ fi
 cd "$REPO_ROOT"
 rm -rf "$TEST_ROOT"
 
-echo "✓ @root works from deeply nested directories"
+echo "✓ @project works from deeply nested directories"
 exit 0

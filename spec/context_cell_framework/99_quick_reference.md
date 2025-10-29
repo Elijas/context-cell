@@ -44,15 +44,24 @@ Order is strict: YAML frontmatter → DISCOVERY → ABSTRACT → FULL_RATIONALE 
 
 **CRITICAL: Always use explicit prefixes**
 
-- `@root/path/to/file` - CELL_PROJECT_ROOT (project root marked by cellproject.toml)
-- `./path/to/file` - WORK_CELL_ROOT (current work cell)
-- `@root/other_cell_v1_01/_outputs/file.ext` - Another cell's outputs
-- `./_outputs/result.csv` - Current cell's outputs
+- `@project/path/to/file` - PROJECT_ROOT (project root marked by projectroot.toml)
+- `@tree/path/to/file` - TREE_ROOT (work cells root marked by treeroot.toml, optional)
+- `@this/path/to/file` - CELL_ROOT (current work cell)
+
+**Common patterns:**
+- `@project/src/main.py` - Project codebase files
+- `@tree/other_cell_v1_01/_outputs/file.ext` - Another cell's outputs (when using treeroot.toml)
+- `@project/work_cells/cell_v1_01/_outputs/file.ext` - Another cell (without treeroot.toml)
+- `@this/_outputs/result.csv` - Current cell's outputs
 
 ❌ WRONG: `schemas/spec.json` (bare path - ambiguous)
-❌ WRONG: `/schemas/spec.json` (leading slash without @root - ambiguous)
-✅ CORRECT: `@root/schemas/spec.json`
-✅ CORRECT: `./_outputs/result.csv`
+❌ WRONG: `/schemas/spec.json` (leading slash without @project - ambiguous)
+✅ CORRECT: `@project/schemas/spec.json`
+✅ CORRECT: `@tree/cell_v1_01/_outputs/data.csv`
+✅ CORRECT: `@this/_outputs/result.csv`
+
+**When to use treeroot.toml:**
+Place `treeroot.toml` marker when work cells are nested deep (e.g., `project/work_cells/`) to get shorter `@tree/` paths instead of long `@project/work_cells/` paths.
 
 ## Commands
 
@@ -60,19 +69,24 @@ Order is strict: YAML frontmatter → DISCOVERY → ABSTRACT → FULL_RATIONALE 
 # Orient - show work cell structure in XML format
 cell orient .                                    # Quick overview (DISCOVERY)
 cell orient --ABSTRACT .                         # Detailed view (ABSTRACT)
-cell orient --descendants --ABSTRACT @root       # Full project tree
+cell orient @project                                # Auto-corrects to @tree (with warning if different)
+cell orient @tree                                # Orient from work cells root (explicit)
+cell orient --descendants --ABSTRACT @tree       # Full work cells tree
 
 # Validate - check work cell correctness
 cell validate .                                  # Validate current cell
-cell validate @root                              # Validate project root
+cell validate @project                              # Validate project root
+cell validate @tree                              # Validate work cells root
 
-# Expand - convert @root symbols to absolute paths
-cell expand @root                                # Get project root path
-cd $(cell expand @root/auth_v1_01)              # Navigate to cell
+# Expand - convert @project/@tree symbols to absolute paths
+cell expand @project                                # Get project root path
+cell expand @tree                                # Get work cells root path
+cd $(cell expand @project/auth_v1_01)              # Navigate using @project
+cd $(cell expand @tree/auth_v1_01)              # Navigate using @tree
 
 # Spec - output complete framework specification
 cell spec                                        # Output full spec
-cell spec --project-root @root                   # Include project context
+cell spec --project-root @project                   # Include project context
 
 # Claude - launch subagent for delegated work
 cd testing_v1_01 && cell claude --window-title "testing_v1_01" "Work in current cell"
@@ -127,5 +141,6 @@ Only files intended for consumption outside the cell go in `_outputs/`.
 
 - ABSTRACT is compressed (5-10 sentences), FULL_* sections are detailed
 - work_complete status is self-declared (true = work accomplished)
-- Path prefixes (@root/ and ./) are mandatory, never use bare paths
+- Path prefixes (@project/, @tree/, and ./) are mandatory, never use bare paths
 - LOG uses ISO 8601 timestamps: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
+- `@tree` is optional: only use treeroot.toml when cells are deeply nested

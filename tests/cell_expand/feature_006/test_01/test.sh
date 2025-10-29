@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test 01: Absolute and relative paths work without cellproject.toml
+# Test 01: Absolute and relative paths work without projectroot.toml
 
 set -e
 
@@ -8,11 +8,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 
-# Create test directory without cellproject.toml
+# Create test directory without projectroot.toml
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/subdir"
 
-# Run from directory without cellproject.toml
+# Run from directory without projectroot.toml
 cd "$TEST_ROOT/subdir"
 
 # Test absolute path
@@ -53,5 +53,5 @@ fi
 cd "$REPO_ROOT"
 rm -rf "$TEST_ROOT"
 
-echo "✓ Non-@root paths work without cellproject.toml"
+echo "✓ Non-@project paths work without projectroot.toml"
 exit 0

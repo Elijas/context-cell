@@ -3,13 +3,13 @@
 # cell validate - Validate work cell structure and CELL.md format
 # Checks naming convention, required files, and format compliance
 
-# Function to find cellproject.toml by walking up directory tree
+# Function to find projectroot.toml by walking up directory tree
 find_project_root() {
     local current_dir="$1"
 
     # Walk up the directory tree
     while [ "$current_dir" != "/" ]; do
-        if [ -f "$current_dir/cellproject.toml" ]; then
+        if [ -f "$current_dir/projectroot.toml" ]; then
             echo "$current_dir"
             return 0
         fi
@@ -17,12 +17,38 @@ find_project_root() {
     done
 
     # Check root directory as well
-    if [ -f "/cellproject.toml" ]; then
+    if [ -f "/projectroot.toml" ]; then
         echo "/"
         return 0
     fi
 
     return 1
+}
+
+# Function to find treeroot.toml by walking up directory tree
+# Falls back to project root if not found
+find_work_root() {
+    local current_dir="$1"
+    local project_root="$2"
+
+    # Walk up the directory tree
+    while [ "$current_dir" != "/" ]; do
+        if [ -f "$current_dir/treeroot.toml" ]; then
+            echo "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+
+    # Check root directory as well
+    if [ -f "/treeroot.toml" ]; then
+        echo "/"
+        return 0
+    fi
+
+    # Fall back to project root if treeroot.toml not found
+    echo "$project_root"
+    return 0
 }
 
 # Validate work cell directory naming convention
@@ -198,7 +224,8 @@ Validate work cell structure and CELL.md format compliance.
 
 PATH (required):
   .                Current directory
-  @root            Project root (first ancestral folder with cellproject.toml)
+  @project            Project root (first ancestral folder with projectroot.toml)
+  @tree            Work cells root (first ancestral folder with treeroot.toml)
   path/to/cell     Specific work cell directory
 
 VALIDATION RULES:
@@ -224,7 +251,8 @@ VALIDATION RULES:
 
 EXAMPLES:
   cell validate .                  # Validate current directory
-  cell validate @root              # Validate project root
+  cell validate @project              # Validate project root
+  cell validate @tree              # Validate work cells root
   cell validate path/to/cell       # Validate specific cell
 
 EXIT CODES:
@@ -245,8 +273,12 @@ main() {
             --help|-h)
                 show_help
                 ;;
-            @root)
-                path_arg="@root"
+            @project)
+                path_arg="@project"
+                shift
+                ;;
+            @tree)
+                path_arg="@tree"
                 shift
                 ;;
             -*)
@@ -268,24 +300,43 @@ main() {
         exit 1
     fi
 
-    # Handle @root symbol: expand to project root before validating path
-    if [ "$path_arg" = "@root" ]; then
+    # Handle @project and @tree symbols: expand before validating path
+    if [ "$path_arg" = "@project" ]; then
         # Find project root from current directory
         local temp_root=$(find_project_root "$(pwd)")
         if [ -z "$temp_root" ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
         path_arg="$temp_root"
-    elif [[ "$path_arg" == @root/* ]]; then
-        # Handle @root/subpath syntax
+    elif [[ "$path_arg" == @project/* ]]; then
+        # Handle @project/subpath syntax
         local temp_root=$(find_project_root "$(pwd)")
         if [ -z "$temp_root" ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
-        # Replace @root with actual root path
-        path_arg="${temp_root}/${path_arg#@root/}"
+        # Replace @project with actual root path
+        path_arg="${temp_root}/${path_arg#@project/}"
+    elif [ "$path_arg" = "@tree" ]; then
+        # Find work root from current directory
+        local temp_project_root=$(find_project_root "$(pwd)")
+        if [ -z "$temp_project_root" ]; then
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            exit 1
+        fi
+        local temp_work_root=$(find_work_root "$(pwd)" "$temp_project_root")
+        path_arg="$temp_work_root"
+    elif [[ "$path_arg" == @tree/* ]]; then
+        # Handle @tree/subpath syntax
+        local temp_project_root=$(find_project_root "$(pwd)")
+        if [ -z "$temp_project_root" ]; then
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            exit 1
+        fi
+        local temp_work_root=$(find_work_root "$(pwd)" "$temp_project_root")
+        # Replace @tree with actual work root path
+        path_arg="${temp_work_root}/${path_arg#@tree/}"
     fi
 
     # Resolve path

@@ -17,14 +17,14 @@ Command requires path argument:
 ```bash
 cell validate .                    # Current directory
 cell validate path/to/work_cell    # Specific directory
-cell validate @root                # Project root
+cell validate @project                # Project root
 ```
 
 Path can be:
 
 - `.` - Current directory
-- `@root` - Project root (first ancestral folder containing cellproject.toml)
-- `@root/subpath` - Path relative to CELL_PROJECT_ROOT
+- `@project` - Project root (first ancestral folder containing projectroot.toml)
+- `@project/subpath` - Path relative to PROJECT_ROOT
 - Relative path (resolved from current working directory)
 - Absolute path
 
@@ -65,7 +65,7 @@ Work cell must contain `CELL.md` file.
 
 Validation checks:
 
-- File exists at `{WORK_CELL_ROOT}/CELL.md`
+- File exists at `{CELL_ROOT}/CELL.md`
 - File is readable
 
 Error message: "Missing required file: CELL.md"
@@ -164,12 +164,12 @@ Each error is reported on a separate line with the cell name and specific error 
 
 # context
 
-When path argument is `@root`, find project root by walking up directory tree.
+When path argument is `@project`, find project root by walking up directory tree.
 
 Find root by walking up from current directory until:
 
-- `cellproject.toml` found → use that directory as root
-- Reached filesystem root → error: "No cellproject.toml found in directory hierarchy"
+- `projectroot.toml` found → use that directory as root
+- Reached filesystem root → error: "No projectroot.toml found in directory hierarchy"
 
 Then validate the root directory as a work cell.
 
@@ -180,7 +180,7 @@ Exit with error code 1 and message if:
 - Path argument is missing
 - Path argument doesn't exist
 - Path is not a directory
-- No `cellproject.toml` found when using `@root`
+- No `projectroot.toml` found when using `@project`
 - Any validation rule fails
 
 Validation continues through all rules even if early checks fail (report all errors, not just first one).

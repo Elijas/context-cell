@@ -12,7 +12,7 @@ TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/above_execution"
 mkdir -p "$TEST_ROOT/above_execution/execution/parent_v1_01/child_v1_01"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -72,7 +72,7 @@ if [ "$cell_count" -ne 2 ]; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/above_execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/above_execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Ancestry correctly stops at execution boundary"
 exit 0

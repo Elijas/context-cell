@@ -15,7 +15,7 @@ mkdir -p "$TEST_ROOT/execution/parent_v1_01/_private"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/.hidden"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/no_version"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -94,7 +94,7 @@ if echo "$output" | grep -q "no_version"; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Invalid directory names are correctly ignored"
 exit 0

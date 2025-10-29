@@ -11,7 +11,7 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/test_v1_01"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -58,12 +58,12 @@ if [ $exit_code -ne 1 ] || ! echo "$output" | grep -q "found at line 15"; then
     echo "✗ Expected DISCOVERY position error with line 15"
     echo "  Output: $output"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/test_v1_01" "$TEST_ROOT/cellproject.toml"
+    rm -rf "$TEST_ROOT/test_v1_01" "$TEST_ROOT/projectroot.toml"
     exit 1
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/test_v1_01" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/test_v1_01" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ DISCOVERY on line 15 fails validation"
 exit 0

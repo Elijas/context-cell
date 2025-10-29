@@ -169,16 +169,16 @@ cell validate path/to/work_cell
 
 # feature_012
 
-Command validates project root when path is `@root`.
+Command validates project root when path is `@project`.
 
 Usage:
 ```bash
-cell validate @root
+cell validate @project
 ```
 
-Finds `cellproject.toml` and validates that directory.
+Finds `projectroot.toml` and validates that directory.
 
-**Test**: Run from nested directory with `@root`. Verify validates root.
+**Test**: Run from nested directory with `@project`. Verify validates root.
 
 # feature_013
 
@@ -195,16 +195,16 @@ Exit code: 1
 
 # feature_014
 
-Using `@root` without cellproject.toml produces error.
+Using `@project` without projectroot.toml produces error.
 
 Output:
 ```
-Error: No cellproject.toml found in directory hierarchy
+Error: No projectroot.toml found in directory hierarchy
 ```
 
 Exit code: 1
 
-**Test**: Run `cell validate @root` from directory without cellproject.toml. Verify error.
+**Test**: Run `cell validate @project` from directory without projectroot.toml. Verify error.
 
 # feature_015
 

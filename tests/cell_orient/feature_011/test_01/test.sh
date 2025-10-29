@@ -12,7 +12,7 @@ TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/uptodate_v1_01"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/outofdate_v1_01"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -102,7 +102,7 @@ if ! echo "$output" | grep -q "outofdate_v1_01/ \[✗\]"; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ work_complete indicators display correctly"
 exit 0

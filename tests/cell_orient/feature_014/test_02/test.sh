@@ -13,7 +13,7 @@ mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_v1_01"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_v1_02"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_v1_01/grandchild_v1_01"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -69,7 +69,7 @@ if ! echo "$output" | grep -q "^=== CHILDREN ===$"; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Section headers formatted correctly"
 exit 0

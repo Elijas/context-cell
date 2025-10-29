@@ -11,7 +11,7 @@ CELL_ORIENT="$REPO_ROOT/bin/_cell_orient.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution"
 
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -36,7 +36,7 @@ if ! echo "$output" | grep -q "No work cells found in current location"; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
 
 echo "✓ Empty hierarchy shows correct message with exit code 0"
 exit 0

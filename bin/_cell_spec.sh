@@ -3,13 +3,13 @@
 # cell spec - Output complete Context Cell framework specification
 # Provides all detailed framework explanation in a single output, eliminating the need for additional navigation
 
-# Function to find cellproject.toml by walking up directory tree
+# Function to find projectroot.toml by walking up directory tree
 find_project_root() {
     local current_dir="$1"
 
     # Walk up the directory tree
     while [ "$current_dir" != "/" ]; do
-        if [ -f "$current_dir/cellproject.toml" ]; then
+        if [ -f "$current_dir/projectroot.toml" ]; then
             echo "$current_dir"
             return 0
         fi
@@ -17,12 +17,38 @@ find_project_root() {
     done
 
     # Check root directory as well
-    if [ -f "/cellproject.toml" ]; then
+    if [ -f "/projectroot.toml" ]; then
         echo "/"
         return 0
     fi
 
     return 1
+}
+
+# Function to find treeroot.toml by walking up directory tree
+# Falls back to project root if not found
+find_work_root() {
+    local current_dir="$1"
+    local project_root="$2"
+
+    # Walk up the directory tree
+    while [ "$current_dir" != "/" ]; do
+        if [ -f "$current_dir/treeroot.toml" ]; then
+            echo "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+
+    # Check root directory as well
+    if [ -f "/treeroot.toml" ]; then
+        echo "/"
+        return 0
+    fi
+
+    # Fall back to project root if treeroot.toml not found
+    echo "$project_root"
+    return 0
 }
 
 # Show help
@@ -37,16 +63,16 @@ explanation in a single output, eliminating the need for additional navigation.
 OPTIONS:
   --path PATH              Path to directory containing files to concatenate
                           Default: Dynamically resolved relative to script location
-                          Supports @root symbol for CELL_PROJECT_ROOT
+                          Supports @project symbol for PROJECT_ROOT
   --project-root PATH      Context Cell project root path to include in output
-                          Supports @root symbol for CELL_PROJECT_ROOT
+                          Supports @project symbol for PROJECT_ROOT
   --help                  Show this help message
 
 EXAMPLES:
   cell spec                                        # Use default path
   cell spec --path /custom/path                    # Use custom path
-  cell spec --path @root/spec                      # Use @root symbol
-  cell spec --project-root @root                   # Include project root in output
+  cell spec --path @project/spec                      # Use @project symbol
+  cell spec --project-root @project                   # Include project root in output
 
 EXIT CODES:
   0 - Success
@@ -97,47 +123,47 @@ main() {
         esac
     done
 
-    # Handle @root symbol expansion for --path
-    if [ "$target_path" = "@root" ]; then
+    # Handle @project symbol expansion for --path
+    if [ "$target_path" = "@project" ]; then
         # Find project root from current directory
         local temp_root=$(find_project_root "$(pwd)")
         if [ $? -ne 0 ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
         target_path="$temp_root"
         custom_path_provided=true
-    elif [[ "$target_path" == @root/* ]]; then
-        # Handle @root/subpath syntax
+    elif [[ "$target_path" == @project/* ]]; then
+        # Handle @project/subpath syntax
         local temp_root=$(find_project_root "$(pwd)")
         if [ $? -ne 0 ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
-        # Replace @root with actual root path
-        target_path="${temp_root}/${target_path#@root/}"
+        # Replace @project with actual root path
+        target_path="${temp_root}/${target_path#@project/}"
         custom_path_provided=true
     fi
 
-    # Handle @root symbol expansion for --project-root
+    # Handle @project symbol expansion for --project-root
     if [ -n "$project_root" ]; then
-        if [ "$project_root" = "@root" ]; then
+        if [ "$project_root" = "@project" ]; then
             # Find project root from current directory
             local temp_root=$(find_project_root "$(pwd)")
             if [ $? -ne 0 ]; then
-                echo "Error: No cellproject.toml found in directory hierarchy" >&2
+                echo "Error: No projectroot.toml found in directory hierarchy" >&2
                 exit 1
             fi
             project_root="$temp_root"
-        elif [[ "$project_root" == @root/* ]]; then
-            # Handle @root/subpath syntax
+        elif [[ "$project_root" == @project/* ]]; then
+            # Handle @project/subpath syntax
             local temp_root=$(find_project_root "$(pwd)")
             if [ $? -ne 0 ]; then
-                echo "Error: No cellproject.toml found in directory hierarchy" >&2
+                echo "Error: No projectroot.toml found in directory hierarchy" >&2
                 exit 1
             fi
-            # Replace @root with actual root path
-            project_root="${temp_root}/${project_root#@root/}"
+            # Replace @project with actual root path
+            project_root="${temp_root}/${project_root#@project/}"
         fi
     fi
 
@@ -173,7 +199,7 @@ main() {
     fi
 
     # Output opening tag
-    echo "<CONTEXT_CELL_SPECIFICATION>"
+    echo "<CONTEXT_CELL_FRAMEWORK_SPECIFICATION>"
 
     # Concatenate and output all files
     for file in "${files[@]}"; do
@@ -185,7 +211,7 @@ main() {
     done
 
     # Output closing tag
-    echo "</CONTEXT_CELL_SPECIFICATION>"
+    echo "</CONTEXT_CELL_FRAMEWORK_SPECIFICATION>"
 
     # Add project root information if provided
     if [ -n "$project_root" ]; then
@@ -200,24 +226,44 @@ main() {
         # Get resolved project root
         local project_root_resolved="$(cd "$project_root" 2>/dev/null && pwd -P)"
 
+        # Find work root
+        local work_root=$(find_work_root "$pwd_symlinked" "$project_root")
+        local work_root_resolved="$(cd "$work_root" 2>/dev/null && pwd -P)"
+
         # Always show project root
-        echo "You're operating in Context Cell project at (CELL_PROJECT_ROOT): $project_root"
+        echo "You're operating in Context Cell project at (PROJECT_ROOT): $project_root"
 
         # Show project root resolved path if different
         if [ "$project_root" != "$project_root_resolved" ]; then
-            echo "Project root (CELL_PROJECT_ROOT, resolved): $project_root_resolved"
+            echo "Project root (PROJECT_ROOT, resolved): $project_root_resolved"
         fi
 
-        # Show @root symbol explanation
-        echo "@root is CELL_PROJECT_ROOT"
-        echo "@root expands to $project_root"
-        echo "Example: @root/execution expands to ${project_root}/execution"
+        # Show @project symbol explanation
+        echo "@project is PROJECT_ROOT"
+        echo "@project expands to $project_root"
+        echo "Example: @project/execution expands to ${project_root}/execution"
 
-        # Show working directory information
+        # Show @tree symbol explanation if different from @project
+        if [ "$work_root" != "$project_root" ]; then
+            echo ""
+            echo "Work cells hierarchy root (TREE_ROOT): $work_root"
+            if [ "$work_root" != "$work_root_resolved" ]; then
+                echo "Work root (TREE_ROOT, resolved): $work_root_resolved"
+            fi
+            echo "@tree is TREE_ROOT"
+            echo "@tree expands to $work_root"
+            echo "Example: @tree/grado_v1_01 expands to ${work_root}/grado_v1_01"
+        fi
+
+        # Show current working directory (CELL_ROOT)
+        echo ""
+        echo "Current working directory (CELL_ROOT): $pwd_symlinked"
         if [ "$pwd_symlinked" != "$pwd_resolved" ]; then
-            echo "Working directory (WORK_CELL_ROOT, symlinked): $pwd_symlinked"
-            echo "Working directory (WORK_CELL_ROOT, resolved): $pwd_resolved"
+            echo "Current working directory (CELL_ROOT, resolved): $pwd_resolved"
         fi
+        echo "@this is CELL_ROOT"
+        echo "@this expands to $pwd_symlinked"
+        echo "Example: @this/_outputs/results.csv expands to ${pwd_symlinked}/_outputs/results.csv"
     fi
 }
 

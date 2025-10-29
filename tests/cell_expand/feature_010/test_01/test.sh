@@ -12,8 +12,8 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/execution"
 
-# Create cellproject.toml
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+# Create projectroot.toml
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -21,11 +21,11 @@ EOF
 # Create test file
 echo "test content" > "$TEST_ROOT/execution/test.txt"
 
-# Change to test directory so cell expand can find cellproject.toml
+# Change to test directory so cell expand can find projectroot.toml
 cd "$TEST_ROOT"
 
 # Test cd with command substitution (should stay in TEST_ROOT)
-cd $("$CELL_EXPAND" @root)
+cd $("$CELL_EXPAND" @project)
 if [ "$(pwd)" != "$TEST_ROOT" ]; then
     echo "✗ cd substitution failed: expected $TEST_ROOT, got $(pwd)"
     cd "$REPO_ROOT"
@@ -34,7 +34,7 @@ if [ "$(pwd)" != "$TEST_ROOT" ]; then
 fi
 
 # Test ls with command substitution
-ls_output=$(ls $("$CELL_EXPAND" @root/execution) 2>&1)
+ls_output=$(ls $("$CELL_EXPAND" @project/execution) 2>&1)
 if ! echo "$ls_output" | grep -q "test.txt"; then
     echo "✗ ls substitution failed: test.txt not found"
     echo "  Output: $ls_output"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test 01: Error when no cellproject.toml found
+# Test 01: Error when no projectroot.toml found
 
 set -e
 
@@ -25,7 +25,7 @@ else
         output=$(gtimeout 5 "$CELL_ORIENT" . 2>&1) || exit_code=$?
     else
         # No timeout available, skip this specific check
-        # Just test that it exits with error when cellproject.toml exists in parent
+        # Just test that it exits with error when projectroot.toml exists in parent
         # but we're outside the hierarchy
         cd "$REPO_ROOT"
         rm -rf "$SCRIPT_DIR/no_project_root"
@@ -45,8 +45,8 @@ fi
 
 # Verify error message (if not timed out)
 if [ $exit_code -eq 1 ]; then
-    if ! echo "$output" | grep -q "No cellproject.toml found in directory hierarchy"; then
-        echo "✗ Expected error message about missing cellproject.toml"
+    if ! echo "$output" | grep -q "No projectroot.toml found in directory hierarchy"; then
+        echo "✗ Expected error message about missing projectroot.toml"
         echo "  Output: $output"
         cd "$REPO_ROOT"
         rm -rf "$SCRIPT_DIR/no_project_root"
@@ -58,5 +58,5 @@ fi
 cd "$REPO_ROOT"
 rm -rf "$SCRIPT_DIR/no_project_root"
 
-echo "✓ Exits with error when no cellproject.toml found"
+echo "✓ Exits with error when no projectroot.toml found"
 exit 0

@@ -12,15 +12,15 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT"
 
-# Create cellproject.toml
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+# Create projectroot.toml
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
 
 # Test complex subpath
 cd "$TEST_ROOT"
-complex_path="@root/execution/auth_v1_01/testing_v1_02/_outputs/results.json"
+complex_path="@project/execution/auth_v1_01/testing_v1_02/_outputs/results.json"
 output=$("$CELL_EXPAND" "$complex_path" 2>&1)
 exit_code=$?
 

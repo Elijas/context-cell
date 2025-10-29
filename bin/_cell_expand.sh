@@ -1,15 +1,16 @@
 #!/bin/bash
 
-# cell expand - Expand @root path symbol to absolute path
-# Expands @root to CELL_PROJECT_ROOT (the directory containing cellproject.toml)
+# cell expand - Expand @project and @tree path symbols to absolute paths
+# Expands @project to PROJECT_ROOT (the directory containing projectroot.toml)
+# Expands @tree to TREE_ROOT (the directory containing treeroot.toml, or project root if not found)
 
-# Function to find cellproject.toml by walking up directory tree
+# Function to find projectroot.toml by walking up directory tree
 find_project_root() {
     local current_dir="$1"
 
     # Walk up the directory tree
     while [ "$current_dir" != "/" ]; do
-        if [ -f "$current_dir/cellproject.toml" ]; then
+        if [ -f "$current_dir/projectroot.toml" ]; then
             echo "$current_dir"
             return 0
         fi
@@ -17,7 +18,7 @@ find_project_root() {
     done
 
     # Check root directory as well
-    if [ -f "/cellproject.toml" ]; then
+    if [ -f "/projectroot.toml" ]; then
         echo "/"
         return 0
     fi
@@ -25,37 +26,68 @@ find_project_root() {
     return 1
 }
 
+# Function to find treeroot.toml by walking up directory tree
+# Falls back to project root if not found
+find_work_root() {
+    local current_dir="$1"
+    local project_root="$2"
+
+    # Walk up the directory tree
+    while [ "$current_dir" != "/" ]; do
+        if [ -f "$current_dir/treeroot.toml" ]; then
+            echo "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+
+    # Check root directory as well
+    if [ -f "/treeroot.toml" ]; then
+        echo "/"
+        return 0
+    fi
+
+    # Fall back to project root if treeroot.toml not found
+    echo "$project_root"
+    return 0
+}
+
 # Help function
 show_help() {
   cat << 'EOF'
 Usage: cell expand PATH
 
-Expand @root path symbol to absolute path.
+Expand @project and @tree path symbols to absolute paths.
 
-The @root symbol expands to CELL_PROJECT_ROOT (the directory containing
-cellproject.toml). This command is useful for converting symbolic paths
-to absolute paths for use in scripts and commands.
+The @project symbol expands to PROJECT_ROOT (the directory containing
+projectroot.toml). The @tree symbol expands to TREE_ROOT (the directory
+containing treeroot.toml, or project root if treeroot.toml doesn't exist).
 
 PATH FORMATS:
-  @root              -> /absolute/path/to/project/root
-  @root/subpath      -> /absolute/path/to/project/root/subpath
+  @project              -> /absolute/path/to/project/root
+  @project/subpath      -> /absolute/path/to/project/root/subpath
+  @tree              -> /absolute/path/to/work/root
+  @tree/subpath      -> /absolute/path/to/work/root/subpath
   /absolute/path     -> /absolute/path (unchanged)
   relative/path      -> relative/path (unchanged)
 
 EXAMPLES:
-  cell expand @root                        # Print project root
-  cell expand @root/execution              # Expand to absolute path
-  cd $(cell expand @root/execution)        # Navigate using expansion
-  cat $(cell expand @root/schemas/spec.json)  # Read file using expansion
+  cell expand @project                        # Print project root
+  cell expand @tree                        # Print work root
+  cell expand @project/execution              # Expand to absolute path
+  cell expand @tree/grado_v1_01            # Expand work cell path
+  cd $(cell expand @tree/grado_v1_01)      # Navigate using expansion
+  cat $(cell expand @project/schemas/spec.json)  # Read file using expansion
 
 COMMON PATTERNS:
-  cd $(cell expand @root/foo/bar)          # Navigate relative to root
-  ls $(cell expand @root)                  # List root directory
-  find $(cell expand @root) -name "*.py"   # Search from root
+  cd $(cell expand @project/foo/bar)          # Navigate relative to root
+  cd $(cell expand @tree/cell_v1_01)       # Navigate to work cell
+  ls $(cell expand @tree)                  # List work root directory
+  find $(cell expand @project) -name "*.py"   # Search from root
 
 EXIT CODES:
   0 - Success
-  1 - Error (no cellproject.toml found, missing path argument)
+  1 - Error (no projectroot.toml found, missing path argument)
 EOF
   exit 0
 }
@@ -75,26 +107,45 @@ main() {
 
     local path_arg="$1"
 
-    # Handle @root symbol expansion
-    if [ "$path_arg" = "@root" ]; then
+    # Handle @project and @tree symbol expansion
+    if [ "$path_arg" = "@project" ]; then
         # Find project root from current directory
         local project_root=$(find_project_root "$(pwd)")
         if [ -z "$project_root" ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
         echo "$project_root"
-    elif [[ "$path_arg" == @root/* ]]; then
-        # Handle @root/subpath syntax
+    elif [[ "$path_arg" == @project/* ]]; then
+        # Handle @project/subpath syntax
         local project_root=$(find_project_root "$(pwd)")
         if [ -z "$project_root" ]; then
-            echo "Error: No cellproject.toml found in directory hierarchy" >&2
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
             exit 1
         fi
-        # Replace @root with actual root path
-        echo "${project_root}/${path_arg#@root/}"
+        # Replace @project with actual root path
+        echo "${project_root}/${path_arg#@project/}"
+    elif [ "$path_arg" = "@tree" ]; then
+        # Find work root from current directory
+        local project_root=$(find_project_root "$(pwd)")
+        if [ -z "$project_root" ]; then
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            exit 1
+        fi
+        local work_root=$(find_work_root "$(pwd)" "$project_root")
+        echo "$work_root"
+    elif [[ "$path_arg" == @tree/* ]]; then
+        # Handle @tree/subpath syntax
+        local project_root=$(find_project_root "$(pwd)")
+        if [ -z "$project_root" ]; then
+            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            exit 1
+        fi
+        local work_root=$(find_work_root "$(pwd)" "$project_root")
+        # Replace @tree with actual work root path
+        echo "${work_root}/${path_arg#@tree/}"
     else
-        # No @root symbol, return path unchanged
+        # No @project or @tree symbol, return path unchanged
         echo "$path_arg"
     fi
 }

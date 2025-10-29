@@ -8,13 +8,13 @@ Tests are organized by feature, following the features defined in `/Users/user/D
 
 ```
 tests/cell_expand/
-├── feature_001/    # Expand @root to project root path
-├── feature_002/    # Expand @root/subpath
-├── feature_003/    # Non-@root paths pass through unchanged
+├── feature_001/    # Expand @project to project root path
+├── feature_002/    # Expand @project/subpath
+├── feature_003/    # Non-@project paths pass through unchanged
 ├── feature_004/    # Missing path argument error
-├── feature_005/    # @root without cellproject.toml error
-├── feature_006/    # Non-@root paths work without cellproject.toml
-├── feature_007/    # @root works from deep subdirectories
+├── feature_005/    # @project without projectroot.toml error
+├── feature_006/    # Non-@project paths work without projectroot.toml
+├── feature_007/    # @project works from deep subdirectories
 ├── feature_008/    # Complex subpaths preserved
 ├── feature_009/    # Help flag
 └── feature_010/    # Shell command substitution integration
@@ -42,26 +42,26 @@ bash -x ./test.sh
 
 ## Test Details
 
-### feature_001: Expand @root to project root
-- **test_01**: Basic @root expansion from subdirectory
+### feature_001: Expand @project to project root
+- **test_01**: Basic @project expansion from subdirectory
 
-### feature_002: Expand @root/subpath
+### feature_002: Expand @project/subpath
 - **test_01**: Subpath expansion with multiple path components
 
-### feature_003: Non-@root paths pass through
+### feature_003: Non-@project paths pass through
 - **test_01**: Absolute, relative, and dot-relative paths unchanged
 
 ### feature_004: Missing path argument
 - **test_01**: Error when no path provided
 
-### feature_005: @root without cellproject.toml
-- **test_01**: Error when @root used without project root marker
+### feature_005: @project without projectroot.toml
+- **test_01**: Error when @project used without project root marker
 
-### feature_006: Non-@root paths without cellproject.toml
+### feature_006: Non-@project paths without projectroot.toml
 - **test_01**: Absolute and relative paths work without project root
 
 ### feature_007: Deep subdirectory expansion
-- **test_01**: @root works from deeply nested directories
+- **test_01**: @project works from deeply nested directories
 
 ### feature_008: Complex subpaths
 - **test_01**: Multi-level subpaths preserve structure
@@ -98,15 +98,15 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/subdir"
 
-# Create cellproject.toml
-cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
+# Create projectroot.toml
+cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
 
 # Run cell expand
 cd "$TEST_ROOT/subdir"
-output=$("$CELL_EXPAND" @root 2>&1)
+output=$("$CELL_EXPAND" @project 2>&1)
 
 # Assertions
 if [ "$output" != "$TEST_ROOT" ]; then

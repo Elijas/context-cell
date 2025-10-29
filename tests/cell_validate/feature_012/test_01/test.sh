@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Test 01: Validate @root from nested directory
+# Test 01: Validate @project from nested directory
 
 set -e
 
@@ -11,7 +11,7 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/root_v1_01/nested/child_v1_01"
 
-cat > "$TEST_ROOT/root_v1_01/cellproject.toml" << 'EOF'
+cat > "$TEST_ROOT/root_v1_01/projectroot.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -58,10 +58,10 @@ Child implementation.
 - 2025-01-01T00:00:00Z: Created
 EOF
 
-# Run from nested directory with @root
+# Run from nested directory with @project
 cd "$TEST_ROOT/root_v1_01/nested/child_v1_01"
 set +e
-output=$("$CELL_VALIDATE" @root 2>&1)
+output=$("$CELL_VALIDATE" @project 2>&1)
 exit_code=$?
 set -e
 
@@ -84,5 +84,5 @@ fi
 cd "$REPO_ROOT"
 rm -rf "$TEST_ROOT/root_v1_01"
 
-echo "✓ Validate @root from nested directory works"
+echo "✓ Validate @project from nested directory works"
 exit 0

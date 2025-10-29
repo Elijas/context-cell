@@ -7,13 +7,14 @@ When launching child agents in separate windows with `cell claude`, the parent h
 Manually prompt with delegation instructions:
 
 ```bash
-"Launch the work cell we created.
+Launch the work cell we created.
 
 Here's how to launch the agent to work on it (don't use Claude's native Task tool, use cell claude instead):
 
 `cd testing_v1_01 && cell claude -y --window-title "testing_v1_01" "Work in the current cell. Test JWT validation."`
 
-Note that starting this opens a new window, the bash command is non-blocking."
+Note that starting this opens a new window, the bash command is non-blocking.
+Note that you can make the prompt as long as you need to clearly describe the task to the agent.
 ```
 
 ## Potential Solution

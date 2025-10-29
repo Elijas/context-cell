@@ -12,7 +12,8 @@ c -y "Run 'cell orient --ABSTRACT .' as the first step to orient yourself and th
 After you've completed the tasks in the work cell task scope, be sure to thoroughly update your own CELL.md and your parent's CELL.md (be mindful of the volume when updating the parent).
 
 If you need to run actual Python code, be sure to check @root/RUNTIME_FAQ.md for environment-specific guidance.
-
-**Note**: The RUNTIME_FAQ.md pattern provides runtime execution guidance that agents may need to reference during work.
 "
 ```
+
+> [!NOTE]
+> The RUNTIME_FAQ.md is just an example of a pattern to provide runtime execution guidance that agents may need to reference during work.

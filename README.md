@@ -1,21 +1,15 @@
 # Context Cell: Context Management for Complex AI Projects
 
-**When AI writes your code, the prompts you throw away are more valuable than the code you keep. That 2-hour conversation where you figured out _what_ to build? That's your source code now. The implementation is just the compiled artifact.**
+**The problem:** In complex AI projects, valuable context gets lost. Research that mapped the codebase, planning that caught architectural issues, decision rationale: all buried in chat logs or thrown away after code is written.
 
-You're *compiling the JAR and deleting the Java source*.
+**The approach:** Make specs structural, not ephemeral. Organize work into versioned cells (research → planning → execution) with explicit dependencies and context boundaries.
 
-Context Cell makes this paradigm concrete: `CELL.md` files are first-class artifacts. Code is secondary.
+Context Cell is a hierarchical work organization framework for AI agents. It uses versioned "work cells" (folders with structured CELL.md files) to organize complex work into manageable, trackable units with explicit state.
 
-> Context management for complex AI projects. Organize work into versioned cells (research → planning → parallel execution) that prevent agents from losing context.
-
-Or, more formally:
-
-> Context Cell is a hierarchical work organization framework for AI agents. It uses versioned "work cells" (folders) with state synchronization to organize complex work into manageable, trackable units.
-
-Please note before using the framework:
+The core insight: in AI-assisted development, the conversation that figured out *what* to build and *why* is more valuable than the implementation. Context Cell treats that context as first-class artifacts: CELL.md files that survive rewrites, document rationale, and enable dependency tracking.
 
 > [!NOTE]
-> **Early Stage**: Context Cell is successfully used in production across different projects. Read [spec/context_cell_framework](spec/context_cell_framework) in full before using—grasping the fundamentals is key to getting AI agents to work with the framework effectively.
+> **Early Stage**: Successfully used in production across different projects, but rough edges remain. Read [spec/context_cell_framework](spec/context_cell_framework) in full before using. Understanding the fundamentals is key to getting AI agents to work with the framework effectively.
 
 ---
 

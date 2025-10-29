@@ -6,7 +6,7 @@ You're *compiling the JAR and deleting the Java source*.
 
 Context Cell makes this paradigm concrete: `CELL.md` files are first-class artifacts. Code is secondary.
 
-> AI context management for complex projects. Organize work into versioned cells (research → planning → parallel execution) that prevent agents from losing context.
+> Context management for complex AI projects. Organize work into versioned cells (research → planning → parallel execution) that prevent agents from losing context.
 
 Or, more formally:
 

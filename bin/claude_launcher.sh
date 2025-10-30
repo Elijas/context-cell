@@ -34,8 +34,8 @@ A wrapper script for launching Claude CLI with various configurations.
 
 OPTIONS:
   --help                         Show this help message and exit
-  -y, --context-cell                Force enable Context Cell mode (auto-detected by default)
-  -n, --no-context-cell             Disable Context Cell mode even when in a context-cell project
+  -y, --cell                     Force enable Context Cell mode (auto-detected by default)
+  -n, --no-cell                  Disable Context Cell mode even when in a context-cell project
 
   Model Selection:
   -s, --sonnet                   Use Sonnet model (default, with thinking enabled)
@@ -50,26 +50,38 @@ OPTIONS:
   -d, --dangerously-skip-permissions  Skip permission checks (default)
   -p, --with-permission-checks   Enable permission checks
 
+  Non-Interactive Mode:
+  --print                        Print response and exit (non-interactive)
+  --output-format FORMAT         Output format: text, json, or stream-json (requires --print)
+  --input-format FORMAT          Input format: text or stream-json (requires --print)
+
   Window Options:
   -w, --window                   Open in new Ghostty window
   --window-title TITLE           Open in new window with specified title
+
+  Other Claude Flags:
+  All other flags (e.g., --continue, --resume, --fork-session) are passed through to Claude
 
 EXAMPLES:
   claude_launcher.sh              # Auto-detects context-cell project if in one
   claude_launcher.sh -h -w        # Launch Haiku in new window
   claude_launcher.sh -st          # Launch Sonnet with thinking (combined flags)
   claude_launcher.sh --window-title "My Project"  # Launch in titled window
-  claude_launcher.sh -p           # Launch with permission checks enabled
-  claude_launcher.sh -n "work without context-cell"  # Disable context-cell even if in project
+  claude_launcher.sh --with-permission-checks  # Launch with permission checks enabled
+  claude_launcher.sh --no-cell "work without context-cell"  # Disable context-cell even if in project
   claude_launcher.sh how are you  # Multiple words automatically joined into single prompt
+  claude_launcher.sh --print "what is 2+2?"  # Non-interactive mode
+  claude_launcher.sh --print --output-format json "summarize this"  # JSON output
+  claude_launcher.sh --continue   # Continue most recent conversation
 
 NOTES:
   - Context Cell mode is automatically enabled when inside a context-cell project (detected via cellproject.toml)
-  - Use -n/--no-context-cell to disable auto-detection and run without context-cell context
+  - Use --no-cell to disable auto-detection and run without context-cell context
   - Single-letter flags can be combined (e.g., -st for sonnet + thinking)
   - Opening in a new window requires Ghostty terminal
   - All non-option arguments are automatically joined into a single prompt
   - Quotes are optional: "foo bar" and foo bar both work
+  - Unknown flags are passed through to Claude CLI
 EOF
   exit 0
 }
@@ -81,6 +93,7 @@ model="sonnet"
 thinking="true"
 window_title=""
 cell_mode="auto"  # Can be: "auto", "force", or "disabled"
+passthrough_args=()  # Arguments to pass through to Claude
 
 # Expand combined single-letter flags (e.g., -st becomes -s -t)
 expanded_args=()
@@ -105,11 +118,11 @@ while [[ $# -gt 0 ]]; do
     --help)
       show_help
       ;;
-    -y|--context-cell)
+    -y|--cell)
       cell_mode="force"
       shift
       ;;
-    -n|--no-context-cell)
+    -n|--no-cell)
       cell_mode="disabled"
       shift
       ;;
@@ -120,6 +133,33 @@ while [[ $# -gt 0 ]]; do
     -p|--with-permission-checks)
       dangerously=false
       shift
+      ;;
+    --print|--output-format|--input-format|--include-partial-messages|--replay-user-messages|--continue|--resume|--fork-session|--mcp-config|--system-prompt|--append-system-prompt|--permission-mode|--fallback-model|--settings|--add-dir|--ide|--strict-mcp-config|--session-id|--agents|--setting-sources|--plugin-dir)
+      # Pass through to Claude with its argument if it takes one
+      passthrough_args+=("$1")
+      if [[ $1 == --resume ]] && [[ -n $2 && $2 != -* ]]; then
+        # --resume can optionally take an argument
+        passthrough_args+=("$2")
+        shift 2
+      elif [[ $1 == --continue || $1 == --print || $1 == --include-partial-messages || $1 == --replay-user-messages || $1 == --fork-session || $1 == --ide || $1 == --strict-mcp-config ]]; then
+        # These flags take no arguments
+        shift
+      elif [[ -n $2 && $2 != -* ]]; then
+        # Flag takes an argument
+        passthrough_args+=("$2")
+        shift 2
+      else
+        shift
+      fi
+      ;;
+    --allowedTools|--allowed-tools|--disallowedTools|--disallowed-tools)
+      # These can take multiple arguments
+      passthrough_args+=("$1")
+      shift
+      while [[ -n $1 && $1 != -* ]]; do
+        passthrough_args+=("$1")
+        shift
+      done
       ;;
     -w|--window)
       open_new_window=true
@@ -159,9 +199,9 @@ while [[ $# -gt 0 ]]; do
       fi
       ;;
     -*)
-      echo "Invalid option: $1" >&2
-      echo "Use --help for usage information" >&2
-      exit 1
+      # Unknown flag - pass through to Claude
+      passthrough_args+=("$1")
+      shift
       ;;
     *)
       # End of options, break to handle remaining arguments
@@ -208,6 +248,9 @@ cmd_args+=("--model" "$model")
 if [ -n "$thinking" ]; then
   cmd_args+=("--settings" "{\"alwaysThinkingEnabled\": $thinking}")
 fi
+
+# Add passthrough arguments (e.g., --print, --continue, etc.)
+cmd_args+=("${passthrough_args[@]}")
 
 # Add Context Cell context if enabled (not disabled and project_root is set)
 if [ "$cell_mode" != "disabled" ] && [ -n "$project_root" ]; then

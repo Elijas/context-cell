@@ -73,11 +73,6 @@ def claude(*args):
     Usage:
         cell claude [args...]  - Launch Claude with optional arguments
     """
-    # Handle help flag (only --help, let -h pass through to claude_launcher)
-    if args and args[0] == "--help":
-        print(claude.__doc__)
-        return
-
     # Get the directory where this script is located (resolve symlinks)
     script_dir = Path(__file__).resolve().parent
     launcher_path = script_dir / "claude_launcher.sh"
@@ -87,6 +82,23 @@ def claude(*args):
             f"Error: claude_launcher.sh not found at {launcher_path}", file=sys.stderr
         )
         sys.exit(1)
+
+    # Handle help flag - capture output and replace script name
+    if args and args[0] == "--help":
+        try:
+            result = subprocess.run(
+                [str(launcher_path), "--help"],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            # Replace claude_launcher.sh with cell claude in the help output
+            help_text = result.stdout.replace("claude_launcher.sh", "cell claude")
+            print(help_text, end="")
+            sys.exit(result.returncode)
+        except Exception as e:
+            print(f"Error getting help: {e}", file=sys.stderr)
+            sys.exit(1)
 
     # Execute claude_launcher.sh with all arguments
     try:

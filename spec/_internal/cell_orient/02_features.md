@@ -69,11 +69,11 @@ When ABSTRACT is requested (alone or combined with DISCOVERY), full file must be
 
 # feature_006
 
-Command finds project root by walking up directory tree looking for `projectroot.toml` file.
+Command finds project root by walking up directory tree looking for `cellproject.toml` file.
 
-If not found after reaching filesystem root, exits with error code 1 and message: "No projectroot.toml found in directory hierarchy"
+If not found after reaching filesystem root, exits with error code 1 and message: "No cellproject.toml found in directory hierarchy"
 
-**Test**: Run `cell orient` from directory tree without `projectroot.toml`. Verify exits with error code 1 and correct error message. Run from directory with `projectroot.toml` in parent path and verify it finds root correctly.
+**Test**: Run `cell orient` from directory tree without `cellproject.toml`. Verify exits with error code 1 and correct error message. Run from directory with `cellproject.toml` in parent path and verify it finds root correctly.
 
 # feature_007
 
@@ -225,13 +225,13 @@ Not a flat list in separate `<descendants>` section.
 
 # feature_017
 
-When `cell orient @project` is run and `treeroot.toml` exists (making `@tree` different from `@project`), command auto-corrects to use `@tree` instead and displays warning to stderr.
+When `cell orient @project` is run and `celltree.toml` exists (making `@tree` different from `@project`), command auto-corrects to use `@tree` instead and displays warning to stderr.
 
 Behavior:
-- If `@project` == `@tree` (no treeroot.toml): Uses project root, no warning
-- If `@project` != `@tree` (treeroot.toml exists): Auto-corrects to `@tree`, shows warning
+- If `@project` == `@tree` (no celltree.toml): Uses project root, no warning
+- If `@project` != `@tree` (celltree.toml exists): Auto-corrects to `@tree`, shows warning
 - Warning message: "Warning: @project differs from @tree. Auto-correcting to @tree (use @project/path for explicit project root path)"
 - Warning goes to stderr, not stdout
 - `@project/explicit/path` always uses literal project root, no auto-correction
 
-**Test**: Create project structure with `projectroot.toml` at root and `treeroot.toml` in `work_cells/`. From deep work cell, run `cell orient @project`. Verify (1) command orients from `work_cells/` not project root, (2) warning appears on stderr, (3) `cell orient @project/work_cells` uses literal project root with no warning.
+**Test**: Create project structure with `cellproject.toml` at root and `celltree.toml` in `work_cells/`. From deep work cell, run `cell orient @project`. Verify (1) command orients from `work_cells/` not project root, (2) warning appears on stderr, (3) `cell orient @project/work_cells` uses literal project root with no warning.

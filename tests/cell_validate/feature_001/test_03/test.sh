@@ -12,8 +12,8 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/user_api_auth_v10_99"
 
-# Create projectroot.toml
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+# Create cellproject.toml
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -52,7 +52,7 @@ if [ $exit_code -ne 0 ]; then
     echo "✗ Expected exit code 0, got $exit_code"
     echo "  Output: $output"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/user_api_auth_v10_99" "$TEST_ROOT/projectroot.toml"
+    rm -rf "$TEST_ROOT/user_api_auth_v10_99" "$TEST_ROOT/cellproject.toml"
     exit 1
 fi
 
@@ -61,13 +61,13 @@ if ! echo "$output" | grep -q "✓ user_api_auth_v10_99/ - Valid work cell"; the
     echo "✗ Expected success message not found"
     echo "  Output: $output"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/user_api_auth_v10_99" "$TEST_ROOT/projectroot.toml"
+    rm -rf "$TEST_ROOT/user_api_auth_v10_99" "$TEST_ROOT/cellproject.toml"
     exit 1
 fi
 
 # Cleanup
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/user_api_auth_v10_99" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/user_api_auth_v10_99" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ Valid cell with complex name passes validation"
 exit 0

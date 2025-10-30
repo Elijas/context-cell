@@ -11,7 +11,7 @@ CELL_ORIENT="$REPO_ROOT/bin/_cell_orient.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution/auth_v1_01"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -49,7 +49,7 @@ if ! echo "$output" | grep -q "auth_v1_01/ \[✓\]"; then
     exit 1
 fi
 
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ Absolute path argument works correctly"
 exit 0

@@ -11,7 +11,7 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/valid_v1_01"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -47,12 +47,12 @@ set -e
 if [ $exit_code -ne 0 ]; then
     echo "✗ Expected exit code 0, got $exit_code"
     cd "$REPO_ROOT"
-    rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/projectroot.toml"
+    rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/cellproject.toml"
     exit 1
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/valid_v1_01" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ Absolute path works"
 exit 0

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Test 01: Launch with -y flag from deep nested directory
-# The launcher should find projectroot.toml, cd to it, and pass original dir via --add-dir
+# The launcher should find cellproject.toml, cd to it, and pass original dir via --add-dir
 
 set -e
 

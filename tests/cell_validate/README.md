@@ -21,7 +21,7 @@ tests/cell_validate/
 ├── feature_011/    # Path argument support
 ├── feature_012/    # @project path support
 ├── feature_013/    # Invalid path error
-├── feature_014/    # No projectroot.toml error
+├── feature_014/    # No cellproject.toml error
 └── feature_015/    # Missing path argument error
 ```
 

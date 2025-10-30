@@ -4,7 +4,7 @@
 
 By default (without any flags), the script **MUST**:
 
-1. Automatically search for the nearest parent `projectroot.toml` file
+1. Automatically search for the nearest parent `cellproject.toml` file
 2. If found:
    - Print the project root in this format:
      ```
@@ -25,7 +25,7 @@ By default (without any flags), the script **MUST**:
 When given the `-y|--context-cell` flag, the script **MUST**:
 
 1. Force Context Cell mode (same as auto-detection when found)
-2. If no `projectroot.toml` file is found, the script **MUST** crash with an error message
+2. If no `cellproject.toml` file is found, the script **MUST** crash with an error message
 
 ## Disable Mode: `-n|--no-context-cell` flag
 
@@ -101,7 +101,7 @@ EXAMPLES:
   claude_launcher.sh how are you  # Multiple words automatically joined into single prompt
 
 NOTES:
-  - Context Cell mode is automatically enabled when inside a context-cell project (detected via projectroot.toml)
+  - Context Cell mode is automatically enabled when inside a context-cell project (detected via cellproject.toml)
   - Use -n/--no-context-cell to disable auto-detection and run without context-cell context
   - Single-letter flags can be combined (e.g., -st for sonnet + thinking)
   - Opening in a new window requires Ghostty terminal

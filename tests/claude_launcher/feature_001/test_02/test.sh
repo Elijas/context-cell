@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Test 02: Launch with -y flag from project root
-# The launcher should find projectroot.toml in current directory
+# The launcher should find cellproject.toml in current directory
 
 set -e
 
@@ -13,7 +13,7 @@ MOCK_CLAUDE="$REPO_ROOT/tests/mocks/claude"
 # Expected project root is this test directory
 EXPECTED_ROOT="$SCRIPT_DIR"
 
-# Change to test directory (where projectroot.toml exists)
+# Change to test directory (where cellproject.toml exists)
 cd "$SCRIPT_DIR"
 
 # Run the launcher with -y flag using mock claude

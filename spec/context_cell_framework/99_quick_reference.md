@@ -44,15 +44,24 @@ Order is strict: YAML frontmatter → DISCOVERY → ABSTRACT → FULL_RATIONALE 
 
 **CRITICAL: Always use explicit prefixes**
 
-- `@project/path/to/file` - PROJECT_ROOT (project root marked by projectroot.toml)
-- `@tree/path/to/file` - TREE_ROOT (work cells root marked by treeroot.toml, optional)
+- `@project/path/to/file` - PROJECT_ROOT (project codebase, marked by cellproject.toml)
+- `@tree/path/to/file` - TREE_ROOT (work cells hierarchy, marked by celltree.toml, optional)
 - `@this/path/to/file` - CELL_ROOT (current work cell)
 
-**Common patterns:**
-- `@project/src/main.py` - Project codebase files
-- `@tree/other_cell_v1_01/_outputs/file.ext` - Another cell's outputs (when using treeroot.toml)
-- `@project/work_cells/cell_v1_01/_outputs/file.ext` - Another cell (without treeroot.toml)
-- `@this/_outputs/result.csv` - Current cell's outputs
+**Usage by Root Type:**
+
+**@project** - Project codebase/resources (non-work-cell files):
+- `@project/src/main.py` - Source code
+- `@project/schemas/api.json` - Schemas
+- `@project/docs/guide.md` - Documentation
+
+**@tree** - Work cells and their outputs:
+- `@tree/other_cell_v1_01/_outputs/data.csv` - Another cell's outputs (with celltree.toml)
+- `@project/work_cells/cell_v1_01/_outputs/data.csv` - Another cell (without celltree.toml)
+
+**@this** - Current work cell:
+- `@this/_outputs/results.csv` - Current cell's outputs
+- `@this/notebook.ipynb` - Current cell's working files
 
 ❌ WRONG: `schemas/spec.json` (bare path - ambiguous)
 ❌ WRONG: `/schemas/spec.json` (leading slash without @project - ambiguous)
@@ -60,8 +69,8 @@ Order is strict: YAML frontmatter → DISCOVERY → ABSTRACT → FULL_RATIONALE 
 ✅ CORRECT: `@tree/cell_v1_01/_outputs/data.csv`
 ✅ CORRECT: `@this/_outputs/result.csv`
 
-**When to use treeroot.toml:**
-Place `treeroot.toml` marker when work cells are nested deep (e.g., `project/work_cells/`) to get shorter `@tree/` paths instead of long `@project/work_cells/` paths.
+**When to use celltree.toml:**
+Place `celltree.toml` marker when work cells are nested deep (e.g., `project/work_cells/`) to get shorter `@tree/` paths instead of long `@project/work_cells/` paths.
 
 ## Commands
 
@@ -143,4 +152,4 @@ Only files intended for consumption outside the cell go in `_outputs/`.
 - work_complete status is self-declared (true = work accomplished)
 - Path prefixes (@project/, @tree/, and ./) are mandatory, never use bare paths
 - LOG uses ISO 8601 timestamps: `date -u +"%Y-%m-%dT%H:%M:%SZ"`
-- `@tree` is optional: only use treeroot.toml when cells are deeply nested
+- `@tree` is optional: only use celltree.toml when cells are deeply nested

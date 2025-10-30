@@ -97,12 +97,12 @@ PATH argument is required and supports special symbols:
 - `.` - CELL_ROOT (current work cell)
 - `@project` - PROJECT_ROOT (auto-corrects to `@tree` with warning if they differ)
 - `@project/subpath` - Explicit path from PROJECT_ROOT (e.g., `@project/auth_v1_01`)
-- `@tree` - TREE_ROOT (treeroot.toml location, or PROJECT_ROOT if not found)
+- `@tree` - TREE_ROOT (celltree.toml location, or PROJECT_ROOT if not found)
 - `@tree/subpath` - Explicit path from TREE_ROOT (e.g., `@tree/cell_v1_01`)
 
 If PATH is omitted, command exits with error code 1 and message: "Missing PATH argument"
 
-**Auto-correction behavior**: When you run `cell orient @project` and `treeroot.toml` exists (making `@tree` different from `@project`), the command automatically uses `@tree` instead and shows a warning. This helps you discover the work cells hierarchy root naturally. Use `@project/explicit/path` for literal project root paths.
+**Auto-correction behavior**: When you run `cell orient @project` and `celltree.toml` exists (making `@tree` different from `@project`), the command automatically uses `@tree` instead and shows a warning. This helps you discover the work cells hierarchy root naturally. Use `@project/explicit/path` for literal project root paths.
 
 Note: The same `@project`, `@tree`, and `.` symbols are used in CELL.md file references (see File Reference Conventions in 02_work_cell_structure.md).
 
@@ -172,9 +172,9 @@ Validates:
 PATH argument is required and supports special symbols:
 
 - `.` - CELL_ROOT (current work cell)
-- `@project` - PROJECT_ROOT (first ancestral folder containing projectroot.toml)
+- `@project` - PROJECT_ROOT (first ancestral folder containing cellproject.toml)
 - `@project/subpath` - Path relative to PROJECT_ROOT
-- `@tree` - TREE_ROOT (treeroot.toml location, or PROJECT_ROOT if not found)
+- `@tree` - TREE_ROOT (celltree.toml location, or PROJECT_ROOT if not found)
 - `@tree/subpath` - Path relative to TREE_ROOT
 
 If PATH is omitted, command exits with error code 1 and message: "Missing PATH argument"
@@ -225,9 +225,9 @@ Both `--path` and `--project-root` support `@project` path symbols.
 
 Supports the same path symbols as `cell orient`:
 
-- `@project` - PROJECT_ROOT (first ancestral folder containing projectroot.toml)
+- `@project` - PROJECT_ROOT (first ancestral folder containing cellproject.toml)
 - `@project/subpath` - Path relative to PROJECT_ROOT
-- `@tree` - TREE_ROOT (treeroot.toml location, or PROJECT_ROOT if not found)
+- `@tree` - TREE_ROOT (celltree.toml location, or PROJECT_ROOT if not found)
 - `@tree/subpath` - Path relative to TREE_ROOT
 
 ### Usage Examples
@@ -253,7 +253,7 @@ cell spec --path @project/custom/spec --project-root @project
 
 Command `cell expand` expands `@project` and `@tree` path symbols to absolute paths.
 
-The `@project` symbol expands to PROJECT_ROOT (the directory containing `projectroot.toml`). The `@tree` symbol expands to TREE_ROOT (the directory containing `treeroot.toml`, or PROJECT_ROOT if treeroot.toml doesn't exist). This command converts symbolic paths to absolute paths for use in scripts and commands.
+The `@project` symbol expands to PROJECT_ROOT (the directory containing `cellproject.toml`). The `@tree` symbol expands to TREE_ROOT (the directory containing `celltree.toml`, or PROJECT_ROOT if celltree.toml doesn't exist). This command converts symbolic paths to absolute paths for use in scripts and commands.
 
 Paths without `@project` or `@tree` symbols pass through unchanged, making it safe to use with any path.
 
@@ -328,7 +328,7 @@ cell expand relative/path
 ### Exit Codes
 
 - `0` - Success
-- `1` - Error (no projectroot.toml found when expanding @project symbol, or missing path argument)
+- `1` - Error (no cellproject.toml found when expanding @project symbol, or missing path argument)
 
 ### Notes for AI Agents
 

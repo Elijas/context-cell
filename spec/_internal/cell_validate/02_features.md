@@ -176,7 +176,7 @@ Usage:
 cell validate @project
 ```
 
-Finds `projectroot.toml` and validates that directory.
+Finds `cellproject.toml` and validates that directory.
 
 **Test**: Run from nested directory with `@project`. Verify validates root.
 
@@ -195,16 +195,16 @@ Exit code: 1
 
 # feature_014
 
-Using `@project` without projectroot.toml produces error.
+Using `@project` without cellproject.toml produces error.
 
 Output:
 ```
-Error: No projectroot.toml found in directory hierarchy
+Error: No cellproject.toml found in directory hierarchy
 ```
 
 Exit code: 1
 
-**Test**: Run `cell validate @project` from directory without projectroot.toml. Verify error.
+**Test**: Run `cell validate @project` from directory without cellproject.toml. Verify error.
 
 # feature_015
 

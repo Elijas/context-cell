@@ -26,7 +26,7 @@ if [ ! -d "$TEST_ROOT" ]; then
     exit 1
 fi
 
-# Test 1: @project and @tree show distinct paths when treeroot.toml exists
+# Test 1: @project and @tree show distinct paths when celltree.toml exists
 echo -e "${YELLOW}Test 1: @project and @tree show distinct paths${NC}"
 cd "$TEST_ROOT/explorations/v4/test_v1_01"
 
@@ -72,11 +72,11 @@ fi
 
 echo ""
 
-# Test 3: @tree falls back to @project when treeroot.toml absent
-echo -e "${YELLOW}Test 3: @tree falls back to @project when treeroot.toml absent${NC}"
+# Test 3: @tree falls back to @project when celltree.toml absent
+echo -e "${YELLOW}Test 3: @tree falls back to @project when celltree.toml absent${NC}"
 
-# Remove treeroot.toml temporarily
-mv "$TEST_ROOT/explorations/v4/treeroot.toml" "$TEST_ROOT/explorations/v4/treeroot.toml.bak"
+# Remove celltree.toml temporarily
+mv "$TEST_ROOT/explorations/v4/celltree.toml" "$TEST_ROOT/explorations/v4/celltree.toml.bak"
 
 cd "$TEST_ROOT/explorations/v4/test_v1_01"
 
@@ -84,19 +84,19 @@ cd "$TEST_ROOT/explorations/v4/test_v1_01"
 PROJECT_PATH=$("$CELL_SCRIPT" expand @project 2>&1)
 WORK_PATH=$("$CELL_SCRIPT" expand @tree 2>&1)
 
-# When treeroot.toml is absent, @tree should fall back to @project
+# When celltree.toml is absent, @tree should fall back to @project
 if [ "$WORK_PATH" = "$PROJECT_PATH" ] && [ "$WORK_PATH" = "$TEST_ROOT" ]; then
     echo -e "${GREEN}✓ @tree falls back to @project (both expand to: $WORK_PATH)${NC}"
 else
     echo -e "${RED}✗ @tree didn't fall back to @project correctly${NC}"
     echo "@project expands to: $PROJECT_PATH"
     echo "@tree expands to: $WORK_PATH"
-    mv "$TEST_ROOT/explorations/v4/treeroot.toml.bak" "$TEST_ROOT/explorations/v4/treeroot.toml"
+    mv "$TEST_ROOT/explorations/v4/celltree.toml.bak" "$TEST_ROOT/explorations/v4/celltree.toml"
     exit 1
 fi
 
-# Restore treeroot.toml
-mv "$TEST_ROOT/explorations/v4/treeroot.toml.bak" "$TEST_ROOT/explorations/v4/treeroot.toml"
+# Restore celltree.toml
+mv "$TEST_ROOT/explorations/v4/celltree.toml.bak" "$TEST_ROOT/explorations/v4/celltree.toml"
 
 echo ""
 echo "========================================"

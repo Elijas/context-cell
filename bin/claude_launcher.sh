@@ -3,13 +3,13 @@
 # Claude Launcher
 # A wrapper script for launching Claude CLI with various configurations
 
-# Function to find projectroot.toml by walking up directory tree
+# Function to find cellproject.toml by walking up directory tree
 find_project_root() {
     local current_dir="$PWD"
 
     # Walk up the directory tree
     while [ "$current_dir" != "/" ]; do
-        if [ -f "$current_dir/projectroot.toml" ]; then
+        if [ -f "$current_dir/cellproject.toml" ]; then
             echo "$current_dir"
             return 0
         fi
@@ -17,7 +17,7 @@ find_project_root() {
     done
 
     # Check root directory as well
-    if [ -f "/projectroot.toml" ]; then
+    if [ -f "/cellproject.toml" ]; then
         echo "/"
         return 0
     fi
@@ -64,7 +64,7 @@ EXAMPLES:
   claude_launcher.sh how are you  # Multiple words automatically joined into single prompt
 
 NOTES:
-  - Context Cell mode is automatically enabled when inside a context-cell project (detected via projectroot.toml)
+  - Context Cell mode is automatically enabled when inside a context-cell project (detected via cellproject.toml)
   - Use -n/--no-context-cell to disable auto-detection and run without context-cell context
   - Single-letter flags can be combined (e.g., -st for sonnet + thinking)
   - Opening in a new window requires Ghostty terminal
@@ -178,7 +178,7 @@ if [ "$cell_mode" = "force" ]; then
     echo "Project root (PROJECT_ROOT):"
     echo "  $project_root"
   else
-    echo "Error: Could not find projectroot.toml in any parent directory" >&2
+    echo "Error: Could not find cellproject.toml in any parent directory" >&2
     exit 1
   fi
 elif [ "$cell_mode" = "auto" ]; then

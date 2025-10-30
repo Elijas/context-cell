@@ -2,11 +2,11 @@
 
 Running `cell expand @project` prints the absolute path to project root.
 
-Project root is the directory containing `projectroot.toml`, found by walking up from current directory.
+Project root is the directory containing `cellproject.toml`, found by walking up from current directory.
 
 Output is single line with absolute path, no trailing slash, no additional whitespace.
 
-**Test**: Create test hierarchy with `projectroot.toml` at root. Run `cell expand @project` from various subdirectories. Verify output is correct absolute path to project root.
+**Test**: Create test hierarchy with `cellproject.toml` at root. Run `cell expand @project` from various subdirectories. Verify output is correct absolute path to project root.
 
 # feature_002
 
@@ -16,7 +16,7 @@ The `@project` prefix is replaced with project root path, then `/subpath` is app
 
 Output format: `/absolute/path/to/project/root/subpath`
 
-**Test**: Create test hierarchy with `projectroot.toml`. Run `cell expand @project/cell_v1_01` from various locations. Verify output is correct absolute path with `@project` expanded.
+**Test**: Create test hierarchy with `cellproject.toml`. Run `cell expand @project/cell_v1_01` from various locations. Verify output is correct absolute path with `@project` expanded.
 
 # feature_003
 
@@ -36,27 +36,27 @@ Exit code 1 with stderr message: "Missing PATH argument"
 
 # feature_005
 
-Using `@project` symbol when no `projectroot.toml` exists causes error.
+Using `@project` symbol when no `cellproject.toml` exists causes error.
 
-Exit code 1 with stderr message: "No projectroot.toml found in directory hierarchy"
+Exit code 1 with stderr message: "No cellproject.toml found in directory hierarchy"
 
-**Test**: Create temporary directory without `projectroot.toml`. Run `cell expand @project` from that directory. Verify exit code 1 and correct error message.
+**Test**: Create temporary directory without `cellproject.toml`. Run `cell expand @project` from that directory. Verify exit code 1 and correct error message.
 
 # feature_006
 
-Non-`@project` paths work even without `projectroot.toml`.
+Non-`@project` paths work even without `cellproject.toml`.
 
 Since these paths don't require project root lookup, they succeed and pass through unchanged.
 
-**Test**: Create temporary directory without `projectroot.toml`. Run `cell expand /absolute/path` and `cell expand relative/path`. Verify both succeed with exit code 0 and output unchanged paths.
+**Test**: Create temporary directory without `cellproject.toml`. Run `cell expand /absolute/path` and `cell expand relative/path`. Verify both succeed with exit code 0 and output unchanged paths.
 
 # feature_007
 
 `@project` expansion works from any subdirectory depth.
 
-Project root discovery walks up arbitrary number of parent directories until `projectroot.toml` found.
+Project root discovery walks up arbitrary number of parent directories until `cellproject.toml` found.
 
-**Test**: Create hierarchy with `projectroot.toml` at root and deeply nested subdirectories (5+ levels). Run `cell expand @project` from deepest subdirectory. Verify correct project root path returned.
+**Test**: Create hierarchy with `cellproject.toml` at root and deeply nested subdirectories (5+ levels). Run `cell expand @project` from deepest subdirectory. Verify correct project root path returned.
 
 # feature_008
 

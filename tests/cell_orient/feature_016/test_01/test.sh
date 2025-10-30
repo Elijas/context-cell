@@ -12,7 +12,7 @@ TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_v1_01/grandchild_v1_01/greatgrand_v1_01"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_v1_02"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -124,7 +124,7 @@ if echo "$output_children" | grep -q 'name="greatgrand_v1_01"'; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ --descendants flag shows all descendants recursively"
 exit 0

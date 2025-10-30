@@ -2,7 +2,7 @@
 
 `cell expand` expands `@project` path symbols to absolute paths.
 
-The `@project` symbol expands to PROJECT_ROOT (the directory containing `projectroot.toml`).
+The `@project` symbol expands to PROJECT_ROOT (the directory containing `cellproject.toml`).
 
 Path formats:
 - `@project` → `/absolute/path/to/project/root`
@@ -14,9 +14,9 @@ Paths without `@project` symbols pass through unchanged.
 
 # context
 
-Project root is found by walking up directory tree from current directory looking for `projectroot.toml` file.
+Project root is found by walking up directory tree from current directory looking for `cellproject.toml` file.
 
-If `projectroot.toml` not found after reaching filesystem root (`/`), command exits with error code 1 and message: "No projectroot.toml found in directory hierarchy"
+If `cellproject.toml` not found after reaching filesystem root (`/`), command exits with error code 1 and message: "No cellproject.toml found in directory hierarchy"
 
 # context
 
@@ -36,4 +36,4 @@ The `@project` symbol is consistent across all Context Cell commands and CELL.md
 
 Exit codes:
 - `0` - Success (path expanded or passed through)
-- `1` - Error (missing path argument, or @project symbol used but no projectroot.toml found)
+- `1` - Error (missing path argument, or @project symbol used but no cellproject.toml found)

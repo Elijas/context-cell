@@ -97,10 +97,10 @@ Both sections are mandatory in CELL.md format, but extraction may fail gracefull
 
 Project root detection by walking up directory tree:
 
-Starting from target directory, walk up checking each parent directory for `projectroot.toml` file.
+Starting from target directory, walk up checking each parent directory for `cellproject.toml` file.
 
 If found: Use that directory as project root.
-If reached filesystem root without finding: Exit with error code 1 and message "No projectroot.toml found in directory hierarchy"
+If reached filesystem root without finding: Exit with error code 1 and message "No cellproject.toml found in directory hierarchy"
 
 Ancestry always goes from project root down to current location, including all ancestor work cells in the path.
 
@@ -119,9 +119,9 @@ Path can be:
 - Directory that is or contains a work cell
 - Special symbols: `.` (current dir), `@project`, `@project/subpath`, `@tree`, `@tree/subpath`
 
-**`@project` auto-correction**: When using `@project` alone and `treeroot.toml` exists (making `@tree` different from `@project`), command auto-corrects to `@tree` with a warning. This helps discover work cells hierarchy naturally. Use `@project/explicit/path` for literal project root paths.
+**`@project` auto-correction**: When using `@project` alone and `celltree.toml` exists (making `@tree` different from `@project`), command auto-corrects to `@tree` with a warning. This helps discover work cells hierarchy naturally. Use `@project/explicit/path` for literal project root paths.
 
-**`@tree` symbol**: Expands to TREE_ROOT (directory containing `treeroot.toml`, or PROJECT_ROOT if not found). Use for work cells hierarchy root.
+**`@tree` symbol**: Expands to TREE_ROOT (directory containing `celltree.toml`, or PROJECT_ROOT if not found). Use for work cells hierarchy root.
 
 If path is not itself a work cell:
 - Walk up to find nearest parent work cell
@@ -130,7 +130,7 @@ If path is not itself a work cell:
 Path validation:
 - If path argument missing: Exit with error code 1 and message "Missing PATH argument"
 - If path doesn't exist: Exit with error code 1 and message "Path does not exist: {path}"
-- If path is not within project (above projectroot.toml): Exit with error code 1 and message "Path is outside project root"
+- If path is not within project (above cellproject.toml): Exit with error code 1 and message "Path is outside project root"
 
 # context
 
@@ -138,7 +138,7 @@ Error handling exit codes and messages:
 
 **Exit code 1** (errors):
 - Missing path argument: "Missing PATH argument"
-- No `projectroot.toml` found in hierarchy: "No projectroot.toml found in directory hierarchy"
+- No `cellproject.toml` found in hierarchy: "No cellproject.toml found in directory hierarchy"
 - Path argument doesn't exist: "Path does not exist: {path}"
 - Path is not within project: "Path is outside project root"
 

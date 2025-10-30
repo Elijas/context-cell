@@ -146,7 +146,7 @@ Version/step progression:
 
 Path conventions enforce clarity:
 
-- `@root/path/to/file` — Project root (marked by `projectroot.toml`)
+- `@root/path/to/file` — Project root (marked by `cellproject.toml`)
 - Explicit prefixes eliminate ambiguity, paths stay valid when cells reorganize
 
 ---
@@ -160,13 +160,13 @@ mkdir -p ~/bin && ln -s ~/context-cell/bin/cell ~/bin/cell
 echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
 
 # Add Context Cell to your project
-cd /your/project && touch projectroot.toml
+cd /your/project && touch cellproject.toml
 
 # Launch Context Cell-aware Claude Code
 cd /your/project && cell claude
 ```
 
-**Why `cell claude`?** When launched inside a folder with `projectroot.toml`, it automatically injects the framework specification (`cell spec` output) into the agent's system context. The agent understands Context Cell concepts natively—work cells, `CELL.md` structure, navigation commands—without you explaining them.
+**Why `cell claude`?** When launched inside a folder with `cellproject.toml`, it automatically injects the framework specification (`cell spec` output) into the agent's system context. The agent understands Context Cell concepts natively—work cells, `CELL.md` structure, navigation commands—without you explaining them.
 
 AI agents use `cell` commands to navigate. Both humans and AI agents read `CELL.md` files—it's the central point for storing context in relation to the rest of the system.
 

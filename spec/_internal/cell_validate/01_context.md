@@ -23,7 +23,7 @@ cell validate @project                # Project root
 Path can be:
 
 - `.` - Current directory
-- `@project` - Project root (first ancestral folder containing projectroot.toml)
+- `@project` - Project root (first ancestral folder containing cellproject.toml)
 - `@project/subpath` - Path relative to PROJECT_ROOT
 - Relative path (resolved from current working directory)
 - Absolute path
@@ -168,8 +168,8 @@ When path argument is `@project`, find project root by walking up directory tree
 
 Find root by walking up from current directory until:
 
-- `projectroot.toml` found → use that directory as root
-- Reached filesystem root → error: "No projectroot.toml found in directory hierarchy"
+- `cellproject.toml` found → use that directory as root
+- Reached filesystem root → error: "No cellproject.toml found in directory hierarchy"
 
 Then validate the root directory as a work cell.
 
@@ -180,7 +180,7 @@ Exit with error code 1 and message if:
 - Path argument is missing
 - Path argument doesn't exist
 - Path is not a directory
-- No `projectroot.toml` found when using `@project`
+- No `cellproject.toml` found when using `@project`
 - Any validation rule fails
 
 Validation continues through all rules even if early checks fail (report all errors, not just first one).

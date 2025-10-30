@@ -3,13 +3,13 @@
 # cell spec - Output complete Context Cell framework specification
 # Provides all detailed framework explanation in a single output, eliminating the need for additional navigation
 
-# Function to find projectroot.toml by walking up directory tree
+# Function to find cellproject.toml by walking up directory tree
 find_project_root() {
     local current_dir="$1"
 
     # Walk up the directory tree
     while [ "$current_dir" != "/" ]; do
-        if [ -f "$current_dir/projectroot.toml" ]; then
+        if [ -f "$current_dir/cellproject.toml" ]; then
             echo "$current_dir"
             return 0
         fi
@@ -17,7 +17,7 @@ find_project_root() {
     done
 
     # Check root directory as well
-    if [ -f "/projectroot.toml" ]; then
+    if [ -f "/cellproject.toml" ]; then
         echo "/"
         return 0
     fi
@@ -25,7 +25,7 @@ find_project_root() {
     return 1
 }
 
-# Function to find treeroot.toml by walking up directory tree
+# Function to find celltree.toml by walking up directory tree
 # Falls back to project root if not found
 find_work_root() {
     local current_dir="$1"
@@ -33,7 +33,7 @@ find_work_root() {
 
     # Walk up the directory tree
     while [ "$current_dir" != "/" ]; do
-        if [ -f "$current_dir/treeroot.toml" ]; then
+        if [ -f "$current_dir/celltree.toml" ]; then
             echo "$current_dir"
             return 0
         fi
@@ -41,12 +41,12 @@ find_work_root() {
     done
 
     # Check root directory as well
-    if [ -f "/treeroot.toml" ]; then
+    if [ -f "/celltree.toml" ]; then
         echo "/"
         return 0
     fi
 
-    # Fall back to project root if treeroot.toml not found
+    # Fall back to project root if celltree.toml not found
     echo "$project_root"
     return 0
 }
@@ -128,7 +128,7 @@ main() {
         # Find project root from current directory
         local temp_root=$(find_project_root "$(pwd)")
         if [ $? -ne 0 ]; then
-            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            echo "Error: No cellproject.toml found in directory hierarchy" >&2
             exit 1
         fi
         target_path="$temp_root"
@@ -137,7 +137,7 @@ main() {
         # Handle @project/subpath syntax
         local temp_root=$(find_project_root "$(pwd)")
         if [ $? -ne 0 ]; then
-            echo "Error: No projectroot.toml found in directory hierarchy" >&2
+            echo "Error: No cellproject.toml found in directory hierarchy" >&2
             exit 1
         fi
         # Replace @project with actual root path
@@ -151,7 +151,7 @@ main() {
             # Find project root from current directory
             local temp_root=$(find_project_root "$(pwd)")
             if [ $? -ne 0 ]; then
-                echo "Error: No projectroot.toml found in directory hierarchy" >&2
+                echo "Error: No cellproject.toml found in directory hierarchy" >&2
                 exit 1
             fi
             project_root="$temp_root"
@@ -159,7 +159,7 @@ main() {
             # Handle @project/subpath syntax
             local temp_root=$(find_project_root "$(pwd)")
             if [ $? -ne 0 ]; then
-                echo "Error: No projectroot.toml found in directory hierarchy" >&2
+                echo "Error: No cellproject.toml found in directory hierarchy" >&2
                 exit 1
             fi
             # Replace @project with actual root path

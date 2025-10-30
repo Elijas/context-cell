@@ -15,8 +15,8 @@ rm -rf "$TEST_ROOT"
 # Create project root
 mkdir -p "$TEST_ROOT"
 
-# Create projectroot.toml marker
-touch "$TEST_ROOT/projectroot.toml"
+# Create cellproject.toml marker
+touch "$TEST_ROOT/cellproject.toml"
 
 # Create project src directory (to make it clear this is project codebase)
 mkdir -p "$TEST_ROOT/src"
@@ -24,8 +24,8 @@ mkdir -p "$TEST_ROOT/src"
 # Create explorations/v4 structure
 mkdir -p "$TEST_ROOT/explorations/v4"
 
-# Create treeroot.toml marker
-touch "$TEST_ROOT/explorations/v4/treeroot.toml"
+# Create celltree.toml marker
+touch "$TEST_ROOT/explorations/v4/celltree.toml"
 
 # Create test work cell
 mkdir -p "$TEST_ROOT/explorations/v4/test_v1_01"
@@ -43,7 +43,7 @@ Test work cell for @project auto-correction
 # ABSTRACT
 
 This is a test work cell used to verify that `cell orient @project` auto-corrects
-to `@tree` with a warning when treeroot.toml exists. The work cell is located
+to `@tree` with a warning when celltree.toml exists. The work cell is located
 deep in the project structure at explorations/v4/test_v1_01/.
 
 # FULL_RATIONALE
@@ -63,11 +63,11 @@ echo "Test structure created successfully!"
 echo ""
 echo "Structure:"
 echo "  $TEST_ROOT/"
-echo "  ├── projectroot.toml"
+echo "  ├── cellproject.toml"
 echo "  ├── src/"
 echo "  └── explorations/"
 echo "      └── v4/"
-echo "          ├── treeroot.toml"
+echo "          ├── celltree.toml"
 echo "          └── test_v1_01/"
 echo "              └── CELL.md"
 echo ""

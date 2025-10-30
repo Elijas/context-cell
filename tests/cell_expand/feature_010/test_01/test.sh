@@ -12,8 +12,8 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/execution"
 
-# Create projectroot.toml
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+# Create cellproject.toml
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -21,7 +21,7 @@ EOF
 # Create test file
 echo "test content" > "$TEST_ROOT/execution/test.txt"
 
-# Change to test directory so cell expand can find projectroot.toml
+# Change to test directory so cell expand can find cellproject.toml
 cd "$TEST_ROOT"
 
 # Test cd with command substitution (should stay in TEST_ROOT)

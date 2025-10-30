@@ -11,7 +11,7 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/root_v1_01/nested/child_v1_01"
 
-cat > "$TEST_ROOT/root_v1_01/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/root_v1_01/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF

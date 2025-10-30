@@ -26,12 +26,12 @@ Optional:
 
 Two optional marker files define path roots:
 
-- **`projectroot.toml`** - Marks PROJECT_ROOT at project/repository root. Required.
-- **`treeroot.toml`** - Marks TREE_ROOT where work cells hierarchy begins. Optional; if absent, TREE_ROOT defaults to PROJECT_ROOT.
+- **`cellproject.toml`** - Marks PROJECT_ROOT at project/repository root. Required.
+- **`celltree.toml`** - Marks TREE_ROOT where work cells hierarchy begins. Optional; if absent, TREE_ROOT defaults to PROJECT_ROOT.
 
 Both files are empty and serve only as boundary markers for tools to locate roots.
 
-**When to use `treeroot.toml`:**
+**When to use `celltree.toml`:**
 
 Use when work cells are nested deep in project structure (e.g., `project/work_cells/`) and you want shorter `@tree/` paths instead of long `@project/work_cells/` paths. This separates project codebase references (`@project/src/main.py`) from work cell references (`@tree/cell_v1_01/`).
 
@@ -50,9 +50,9 @@ When referencing files in CELL.md, use explicit prefixes to distinguish between 
 
 **Path Format:**
 
-- **PROJECT_ROOT**: `@project/path/to/file.ext` - ALWAYS use `@project/` prefix for project root paths
-- **TREE_ROOT**: `@tree/path/to/file.ext` - ALWAYS use `@tree/` prefix for work cells hierarchy paths (when treeroot.toml exists)
-- **CELL_ROOT**: `@this/path/to/file.ext` - ALWAYS use `@this/` prefix for current cell paths
+- **PROJECT_ROOT**: `@project/path/to/file.ext` - Use for project codebase files, schemas, documentation, configs
+- **TREE_ROOT**: `@tree/path/to/file.ext` - Use for referencing other work cells and their outputs
+- **CELL_ROOT**: `@this/path/to/file.ext` - Use for files within the current work cell
 - **With line numbers**: `@project/path/file.py:15-25`, `@tree/cell_v1_01/file.py:15-25`, or `@this/file.py:15-25`
 - **With sections**: `@project/path/file.md#section-name`, `@tree/cell_v1_01/CELL.md#abstract`, or `@this/file.md#section-name`
 
@@ -61,19 +61,27 @@ When referencing files in CELL.md, use explicit prefixes to distinguish between 
 - ❌ WRONG: `schemas/spec.json` (bare path - ambiguous)
 - ❌ WRONG: `/schemas/spec.json` (leading slash without `@project` - ambiguous, could mean filesystem root)
 - ✅ CORRECT: `@project/schemas/spec.json` (explicit project root)
-- ✅ CORRECT: `@tree/cell_v1_01/_outputs/data.csv` (explicit work root, when treeroot.toml exists)
+- ✅ CORRECT: `@tree/cell_v1_01/_outputs/data.csv` (explicit work root, when celltree.toml exists)
 - ✅ CORRECT: `@this/_outputs/result.csv` (explicit cell root)
 
-**Common patterns:**
+**Usage by Root Type:**
 
-- `@project/src/main.py` - Project codebase files
-- `@project/schemas/spec.json` - Project schemas or documentation
-- `@tree/other_cell_v1_01/_outputs/file.ext` - Another cell's outputs (when using treeroot.toml)
-- `@project/work_cells/cell_v1_01/_outputs/file.ext` - Another cell's outputs (when not using treeroot.toml)
-- `@this/_outputs/result.csv` - Current cell's outputs
-- `@this/script.py` - Current cell's working files
+**@project** - Project codebase and resources (non-work-cell files):
+- `@project/src/main.py` - Source code
+- `@project/schemas/spec.json` - API schemas
+- `@project/docs/architecture.md` - Documentation
+- `@project/config/settings.yaml` - Configuration files
 
-**Examples:**
+**@tree** - Work cells and their outputs:
+- `@tree/other_cell_v1_01/_outputs/data.csv` - Another cell's outputs (when using celltree.toml)
+- `@tree/auth_v1_03/CELL.md` - Another cell's documentation
+- `@project/work_cells/cell_v1_01/_outputs/data.csv` - Another cell (when not using celltree.toml)
+
+**@this** - Current work cell files:
+- `@this/_outputs/results.csv` - Current cell's outputs
+- `@this/notebook.ipynb` - Current cell's working files
+
+**Real-World Example:**
 
 ```markdown
 # In ABSTRACT or FULL_IMPLEMENTATION sections:
@@ -82,14 +90,18 @@ Built recommendation system using collaborative filtering
 (see `@this/_outputs/model.pkl` and `@this/_outputs/metrics.json`).
 
 Implemented token validation per `@project/schemas/jwt_spec.json#claims`
-specification. Preprocessing used data from
-`@tree/data_prep_v1_02/_outputs/clean_dataset.csv`.
+specification (project schema). Preprocessing used data from
+`@tree/data_prep_v1_02/_outputs/clean_dataset.csv` (another work cell's output).
 
-Core validation logic adapted from  `@tree/auth_v1_01/_outputs/validator.py:45-67`.
-Dataset stats available in `@this/_outputs/dataset_stats.csv`.
+Core validation logic adapted from `@tree/auth_v1_01/_outputs/validator.py:45-67`
+(previous work cell). Dataset stats available in `@this/_outputs/dataset_stats.csv`
+(current cell output).
 
-Preprocessing approach based on `@project/docs/data_guidelines.md#normalization`.
+Preprocessing approach based on `@project/docs/data_guidelines.md#normalization`
+(project documentation).
 ```
+
+**Key Pattern**: `@project` for codebase resources, `@tree` for work cell outputs, `@this` for current cell files.
 
 **Rationale:**
 

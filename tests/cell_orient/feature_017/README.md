@@ -1,16 +1,16 @@
 # feature_017: @project and @tree distinction
 
-Tests that `@project` and `@tree` are distinct path symbols that reference different roots when treeroot.toml exists.
+Tests that `@project` and `@tree` are distinct path symbols that reference different roots when celltree.toml exists.
 
 ## Test Structure
 
 ```
 project_root/
-├── projectroot.toml          # CELL_PROJECT_ROOT marker
+├── cellproject.toml          # CELL_PROJECT_ROOT marker
 ├── src/                      # Project codebase
 └── explorations/
     └── v4/
-        ├── treeroot.toml     # CELL_WORK_ROOT marker
+        ├── celltree.toml     # CELL_WORK_ROOT marker
         └── test_v1_01/       # Work cell
             └── CELL.md
 ```
@@ -31,7 +31,7 @@ cell orient @project 2>&1
 - XML output shows both `@project` and `@tree` paths
 - Exit code: 0
 
-### Test 2: @tree references work root when treeroot.toml exists
+### Test 2: @tree references work root when celltree.toml exists
 
 From `explorations/v4/test_v1_01/`:
 
@@ -44,13 +44,13 @@ cell orient @tree 2>&1
 - Output orients from `explorations/v4/` (work root, not project root)
 - Exit code: 0
 
-### Test 3: @tree falls back to @project when treeroot.toml absent
+### Test 3: @tree falls back to @project when celltree.toml absent
 
-From project with no treeroot.toml:
+From project with no celltree.toml:
 
 ```bash
-# Remove treeroot.toml
-rm explorations/v4/treeroot.toml
+# Remove celltree.toml
+rm explorations/v4/celltree.toml
 cd explorations/v4/test_v1_01
 cell orient @tree 2>&1
 ```

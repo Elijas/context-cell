@@ -13,7 +13,7 @@ mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_a_v1_01/grandchild_v1_01"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_b_v1_01/grandchild_v1_02"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_b_v1_01/grandchild_v1_03"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -133,7 +133,7 @@ if echo "$child_a_norecurse" | grep -q 'name="grandchild_v1_01"'; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ --descendants shows proper nested hierarchical structure"
 exit 0

@@ -11,7 +11,7 @@ CELL_VALIDATE="$REPO_ROOT/bin/_cell_validate.sh"
 TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/Invalid-Root"
 
-cat > "$TEST_ROOT/Invalid-Root/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/Invalid-Root/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF

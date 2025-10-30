@@ -10,7 +10,7 @@ CELL_ORIENT="$REPO_ROOT/bin/_cell_orient.sh"
 
 TEST_ROOT="$SCRIPT_DIR"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -34,7 +34,7 @@ if ! echo "$output" | grep -q "Path does not exist"; then
     exit 1
 fi
 
-rm -rf "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/cellproject.toml"
 
 echo "✓ Invalid path produces correct error"
 exit 0

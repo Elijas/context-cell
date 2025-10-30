@@ -12,7 +12,7 @@ TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/auth_v1_01"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/malformed_v1_01"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -98,7 +98,7 @@ if echo "$output" | grep -q "malformed_v1_01"; then
 fi
 
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ Malformed CELL.md files are correctly ignored"
 exit 0

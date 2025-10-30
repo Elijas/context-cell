@@ -12,8 +12,8 @@ tests/cell_expand/
 ├── feature_002/    # Expand @project/subpath
 ├── feature_003/    # Non-@project paths pass through unchanged
 ├── feature_004/    # Missing path argument error
-├── feature_005/    # @project without projectroot.toml error
-├── feature_006/    # Non-@project paths work without projectroot.toml
+├── feature_005/    # @project without cellproject.toml error
+├── feature_006/    # Non-@project paths work without cellproject.toml
 ├── feature_007/    # @project works from deep subdirectories
 ├── feature_008/    # Complex subpaths preserved
 ├── feature_009/    # Help flag
@@ -54,10 +54,10 @@ bash -x ./test.sh
 ### feature_004: Missing path argument
 - **test_01**: Error when no path provided
 
-### feature_005: @project without projectroot.toml
+### feature_005: @project without cellproject.toml
 - **test_01**: Error when @project used without project root marker
 
-### feature_006: Non-@project paths without projectroot.toml
+### feature_006: Non-@project paths without cellproject.toml
 - **test_01**: Absolute and relative paths work without project root
 
 ### feature_007: Deep subdirectory expansion
@@ -98,8 +98,8 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/subdir"
 
-# Create projectroot.toml
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+# Create cellproject.toml
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF

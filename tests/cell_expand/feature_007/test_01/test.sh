@@ -12,8 +12,8 @@ CELL_EXPAND="$REPO_ROOT/bin/_cell_expand.sh"
 TEST_ROOT="$SCRIPT_DIR/test_temp"
 mkdir -p "$TEST_ROOT/a/b/c/d/e/f/g"
 
-# Create projectroot.toml at root
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+# Create cellproject.toml at root
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF

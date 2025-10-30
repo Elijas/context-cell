@@ -13,7 +13,7 @@ tests/cell_orient/
 ├── feature_003/    # Combining section flags (--DISCOVERY --ABSTRACT)
 ├── feature_004/    # Relationship flags (--ancestors, --peers, --children)
 ├── feature_005/    # DISCOVERY optimization (first 12 lines)
-├── feature_006/    # Project root detection (projectroot.toml)
+├── feature_006/    # Project root detection (cellproject.toml)
 ├── feature_007/    # Execution boundary detection
 ├── feature_008/    # Invalid cells are ignored
 ├── feature_009/    # Empty output handling
@@ -69,7 +69,7 @@ bash -x ./test.sh
 - **test_02**: DISCOVERY beyond line 12 causes cell to be ignored
 
 ### feature_006: Project root detection
-- **test_01**: Error when no projectroot.toml found in hierarchy
+- **test_01**: Error when no cellproject.toml found in hierarchy
 
 ### feature_007: Execution boundary
 - **test_01**: Ancestry stops at execution boundary
@@ -138,7 +138,7 @@ TEST_ROOT="$SCRIPT_DIR"
 # Create test hierarchy
 mkdir -p "$TEST_ROOT/execution/cell_v1_01"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -159,7 +159,7 @@ fi
 
 # Cleanup
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ Test description"
 exit 0

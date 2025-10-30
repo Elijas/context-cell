@@ -36,7 +36,7 @@ Work cells are folders with specific naming: `{branch}_v{version}_{step}`
 
 # context
 
-Project root is marked by `projectroot.toml` file at repository root.
+Project root is marked by `cellproject.toml` file at repository root.
 ```
 
 Each context block should be self-contained and focus on one concept.

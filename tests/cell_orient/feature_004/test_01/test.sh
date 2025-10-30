@@ -13,7 +13,7 @@ TEST_ROOT="$SCRIPT_DIR"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_v1_01/grandchild_v1_01"
 mkdir -p "$TEST_ROOT/execution/parent_v1_01/child_v1_02"
 
-cat > "$TEST_ROOT/projectroot.toml" << 'EOF'
+cat > "$TEST_ROOT/cellproject.toml" << 'EOF'
 [project]
 name = "test"
 EOF
@@ -89,7 +89,7 @@ fi
 
 # Cleanup
 cd "$REPO_ROOT"
-rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/projectroot.toml"
+rm -rf "$TEST_ROOT/execution" "$TEST_ROOT/cellproject.toml"
 
 echo "✓ --ancestors flag shows only ANCESTRY section"
 exit 0

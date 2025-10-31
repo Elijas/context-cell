@@ -60,6 +60,11 @@ find_execution_boundary() {
 
     # Walk up until we reach the root
     while [ "$current_dir" != "$root_path" ]; do
+        # Break if we've reached the filesystem root to prevent infinite loop
+        if [ "$current_dir" = "/" ]; then
+            break
+        fi
+
         local parent_dir="$(dirname "$current_dir")"
 
         # Check if parent contains a directory named "execution"

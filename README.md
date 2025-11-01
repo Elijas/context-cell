@@ -9,7 +9,7 @@ Context Cell is a hierarchical work organization framework for AI agents. It use
 The core insight: in AI-assisted development, the conversation that figured out *what* to build and *why* is more valuable than the implementation. Context Cell treats that context as first-class artifacts: CELL.md files that survive rewrites, document rationale, and enable dependency tracking.
 
 > [!NOTE]
-> **Early Stage**: Successfully used in production across different projects, but rough edges remain. Read [spec/context_cell_framework](spec/context_cell_framework) in full before using. Understanding the fundamentals is key to getting AI agents to work with the framework effectively.
+> **Early Stage**: Rough edges remain. Read [spec/context_cell_framework](spec/context_cell_framework) in full before using. Understanding the fundamentals is key to getting AI agents to work with the framework effectively.
 
 ---
 

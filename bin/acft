@@ -1,0 +1,178 @@
+#!/usr/bin/env python3
+"""Agent Checkpoints Framework Toolchain (acft) CLI dispatcher."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+from typing import Callable, Optional
+
+from _lib import (
+    AcftContext,
+    AcftError,
+    CheckpointFormatError,
+    PathResolutionError,
+)
+from _acft_claude import register as register_claude
+from _acft_close import register as register_close
+from _acft_events import register as register_events
+from _acft_expand import register as register_expand
+from _acft_init import register as register_init
+from _acft_manifest import register as register_manifest
+from _acft_new import register as register_new
+from _acft_orient import register as register_orient
+from _acft_spec import register as register_spec
+from _acft_validate import register as register_validate
+from _acft_verify import register as register_verify
+
+
+CLI_DESCRIPTION = """
+Harness-first workflow helper for the Agent Checkpoints Framework (ACF).
+Roots are resolved relative to the repository:
+  ::PROJECT/ -> repository root
+  ::WORK/    -> checkpoint work root
+  ::THIS/    -> current checkpoint (inferred from $PWD when possible)
+"""
+
+
+Registrar = Callable[[argparse._SubParsersAction], None]
+REGISTRARS: tuple[Registrar, ...] = (
+    register_init,
+    register_orient,
+    register_new,
+    register_close,
+    register_validate,
+    register_manifest,
+    register_verify,
+    register_expand,
+    register_spec,
+    register_events,
+    register_claude,
+)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="acft",
+        description=CLI_DESCRIPTION.strip(),
+        add_help=False,  # Disable automatic -h/--help
+    )
+    # Add only --help (no -h short form)
+    parser.add_argument(
+        "--help",
+        action="help",
+        help="show this help message and exit",
+    )
+    subparsers = parser.add_subparsers(dest="command", metavar="COMMAND")
+    for registrar in REGISTRARS:
+        registrar(subparsers)
+    return parser
+
+
+def main(argv: list[str]) -> int:
+    parser = build_parser()
+
+    # Find the first non-option argument (the COMMAND)
+    # Everything before it is for the router, everything from COMMAND onwards
+    # goes to the child handler
+    command_idx = None
+    for i, arg in enumerate(argv):
+        if not arg.startswith("-"):
+            command_idx = i
+            break
+
+    # If there's a command, split the args
+    if command_idx is not None:
+        router_args = argv[:command_idx]
+        command_name = argv[command_idx]
+        command_args = argv[command_idx + 1:]
+
+        # Handle --help for router (before command)
+        if "--help" in router_args:
+            parser.parse_args(router_args)
+            return 0
+
+        # Special handling for commands that bypass argparse (like claude)
+        # These commands have add_help=False and use REMAINDER to capture all args
+        bypass_commands = {"claude"}
+
+        if command_name in bypass_commands:
+            # Parse only the router args and command name to get the handler
+            # Don't let argparse process the command's arguments
+            args = parser.parse_args(router_args + [command_name])
+
+            # Get the handler for this command
+            handler: Optional[Callable[[argparse.Namespace, AcftContext], int]] = getattr(
+                args, "handler", None
+            )
+            if handler is None:
+                print(f"acft: error: unknown command: {command_name}", file=sys.stderr)
+                return 1
+
+            # Manually set the command args for the handler
+            if hasattr(args, 'claude_args'):
+                args.claude_args = command_args
+
+            ctx = AcftContext.discover()
+            try:
+                return handler(args, ctx)
+            except CheckpointFormatError as exc:
+                print(f"acft error: {exc}", file=sys.stderr)
+                return 2
+            except PathResolutionError as exc:
+                print(f"acft path error: {exc}", file=sys.stderr)
+                return 2
+            except AcftError as exc:
+                print(f"acft error: {exc}", file=sys.stderr)
+                return 1
+        else:
+            # Normal argparse handling for other commands
+            args = parser.parse_args(router_args + [command_name] + command_args)
+
+            handler: Optional[Callable[[argparse.Namespace, AcftContext], int]] = getattr(
+                args, "handler", None
+            )
+            if handler is None:
+                print(f"acft: error: unknown command: {command_name}", file=sys.stderr)
+                return 1
+
+            ctx = AcftContext.discover()
+            try:
+                return handler(args, ctx)
+            except CheckpointFormatError as exc:
+                print(f"acft error: {exc}", file=sys.stderr)
+                return 2
+            except PathResolutionError as exc:
+                print(f"acft path error: {exc}", file=sys.stderr)
+                return 2
+            except AcftError as exc:
+                print(f"acft error: {exc}", file=sys.stderr)
+                return 1
+    else:
+        # No command found, parse normally (will show help or handle --help)
+        args = parser.parse_args(argv)
+
+        handler: Optional[Callable[[argparse.Namespace, AcftContext], int]] = getattr(
+            args, "handler", None
+        )
+        if handler is None:
+            parser.print_help()
+            return 0
+
+        ctx = AcftContext.discover()
+        try:
+            return handler(args, ctx)
+        except CheckpointFormatError as exc:
+            print(f"acft error: {exc}", file=sys.stderr)
+            return 2
+        except PathResolutionError as exc:
+            print(f"acft path error: {exc}", file=sys.stderr)
+            return 2
+        except AcftError as exc:
+            print(f"acft error: {exc}", file=sys.stderr)
+            return 1
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main(sys.argv[1:]))

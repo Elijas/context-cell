@@ -40,6 +40,35 @@ This optimizes **human verification throughput**, not agent speed. The constrain
 - **Audit decisions**: When something breaks, LOG shows what the agent was thinking
 - **Supervise at scale**: Each checkpoint is self-contained—review multiple agents without context-switching hell
 
+## Alternative perspectives on ACF
+
+The supervision model scales beyond single-agent tasks. **If you think in terms of...**
+
+**Git workflow for agent work**
+- Checkpoints = commits (discrete units of work)
+- Delegates = feature branches (scoped sub-tasks)
+- Successors = advancing the main branch
+- LOG = commit history with rationale
+
+**LLM context hygiene ("new task = new chat")**
+- Checkpoints = context boundaries that survive sessions
+- Resume work without replaying entire conversation history
+- Explicit contracts replace implicit shared state
+- Branch explorations without polluting the main thread
+
+**Infrastructure as Code workflow**
+- `terraform plan` → review → `terraform apply`
+- ACF: agent proposes → human reviews → agent executes
+- State drift detection: did ARTIFACTS match MANIFEST?
+- Rollback or pivot without destroying history
+
+**Autonomous long-horizon agents**
+- Execute over a DAG of dependent tasks
+- Resume from any checkpoint after interruption or failure
+- Pivot when requirements change (without losing history)
+- Restart individual branches (version bump) while preserving context
+- Coordinate parallel work streams without shared state conflicts
+
 ## What's in this repo
 
 The framework is structured markdown. No vendor lock-in.
@@ -85,4 +114,4 @@ Like pilot checklists: saying things multiple ways prevents silent drift.
 
 ---
 
-**Status**: Early prototype. Not ready for public use. Building serious agent workflows? [Reach out](https://github.com/elijas/agent-checkpoints/issues).
+**Status**: Early experimental prototype. Expect rough edges. Building serious agent workflows? [Reach out](https://github.com/elijas/agent-checkpoints/issues).

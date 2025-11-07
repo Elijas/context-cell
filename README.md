@@ -40,6 +40,8 @@ This optimizes **human verification throughput**, not agent speed. The constrain
 - **Audit decisions**: When something breaks, LOG shows what the agent was thinking
 - **Supervise at scale**: Each checkpoint is self-contained—review multiple agents without context-switching hell
 
+> **Side effect**: Building primitives for human supervision (state snapshots, dependency tracking, audit trails) accidentally enabled autonomous agent coordination. We solved context management; got DAG execution for free.
+
 ## Alternative perspectives on ACF
 
 The supervision model scales beyond single-agent tasks. **If you think in terms of...**

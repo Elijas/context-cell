@@ -1,30 +1,40 @@
 # Agent Checkpoints Framework
 
-**AI agents can write code. But can they finish projects?**
+**A coordination protocol for human-supervised agent work.**
 
-The moment an agent loses context or hits an error, everything falls apart. Half-finished work, forgotten requirements, "it works" that means "I ran it once."
+This is not documentation—it's a harness that forces agents to declare intent before executing, then prove they delivered. Like Git coordinates code changes, ACF coordinates agent work.
 
 ## The problem
 
-Agents can't pause and resume. They can't hand off work cleanly. They can't verify their own output. So projects stall, context gets lost, and quality becomes a guess.
+The classic principal-agent failure mode:
+
+```
+Human: "build X"
+Agent: *does 2 hours of work in wrong direction*
+Human: "no, that's not what I wanted"
+```
+
+Wasted tokens. Wasted time. Agents can't be redirected cheaply because they don't declare intent upfront—they just execute and hope you'll approve afterward.
 
 ## The solution
 
-**Checkpoints**—structured pause points with built-in quality gates. A contract that makes resumption possible.
+**Checkpoints**: proposals, progress reports, and handoff contracts.
 
-Every checkpoint answers:
+The framework forces a cycle:
 
-- What did we build?
-- How do we know it works?
-- What happens next?
+1. **Agent declares intent** (STATUS, HARNESS, MANIFEST)
+2. **Human approves or redirects** (cheaply, before execution)
+3. **Agent logs what actually happened** (can't silently drift)
+
+This optimizes **human verification throughput**, not agent speed. The constraint isn't "how fast can the agent work?"—it's "how fast can a human spot when the agent is off-track and redirect it?"
 
 ## What you get
 
-- **Real completion**: Success is defined upfront, not guessed at the end
+- **Back-pressure on agent work**: Agents must propose before executing—you catch wrong directions early
+- **Steerable at scale**: You review declarations of intent, not hunt through outputs for what went wrong
 - **Clean handoffs**: Any agent can resume without archaeology
-- **Automatic verification**: Quality gates run themselves
+- **Legible agent work**: Checkpoints make agent decisions inspectable and auditable
 - **Parallel work**: Multiple agents collaborate without collisions
-- **Full audit trail**: Every decision and change is recorded
 
 ## What's in this repo
 
@@ -43,14 +53,14 @@ The framework is just structured markdown files. This means no lock-in to specif
 **No—that's the AI's job.** The human workflow is:
 
 1. Write free-form instructions/questions
-2. AI expands them into structured CHECKPOINT.md
-3. You skim to verify the AI understood correctly
+2. Agent expands them into structured CHECKPOINT.md (declares intent)
+3. You skim to verify the agent understood correctly (approve/redirect)
 
-The structured format is the _output_ of AI work, not a burden on humans. You guide direction, the AI maintains the contract.
+The structured format is the _output_ of agent work, not a burden on humans. You steer direction, the agent maintains the contract.
 
 ### Why do the CHECKPOINT.md sections overlap?
 
-**It's intentional redundancy.** Each section describes the same work from a different angle:
+**It's intentional redundancy for human verification.** Each section describes the same work from a different angle:
 
 - **STATUS** (operator) - "What's alive right now"
 - **HARNESS** (gatekeeper) - "Can I trust this handoff?"
@@ -58,20 +68,20 @@ The structured format is the _output_ of AI work, not a burden on humans. You gu
 - **MANIFEST** (consumer) - "How do I run/verify this?"
 - **LOG** (historian) - "What actually happened when"
 
-For AI→AI handoffs, this redundancy provides error correction. For human reviewers, **seeing the same work from three perspectives reveals conceptual misalignment**—when the AI describes the approach differently in STATUS vs CONTEXT vs MANIFEST, you catch where it misunderstood your intent.
+**Seeing the same work from multiple perspectives reveals when the agent misunderstood your intent**—if STATUS says one thing but CONTEXT describes a different approach, you catch the conceptual misalignment before execution.
 
-Think of it like pilot checklists: saying the same thing three ways catches mistakes that single-source truth would miss.
+This is like pilot checklists: redundancy catches mistakes that single-source truth would miss. For agent→agent handoffs, it provides error correction. For human supervision, it accelerates the "does this agent understand what I want?" check.
 
-### Should I skip this framework if I have only one simple task for Claude?
+### Should I skip this framework if I have only one simple task?
 
-**It depends.** Skip it for truly throwaway work. But use it when you want to build on the work later, reference it in the future, or need polished output rather than quick answers.
+**It depends.** Skip it for truly throwaway work. But use it when you want to build on the work later, reference it in the future, or need to verify the agent understood correctly before executing.
 
-The checkpoint structure changes how Claude approaches even single tasks:
+The checkpoint structure changes how agents approach even single tasks:
 
-- **Reusable context** - Future agents can continue the work without you repeating yourself (or trying to remember) and without them wandering around searching for clues (or guessing incorrectly)
-- **Professional output** - The structure triggers Claude to produce well-structured, complete artifacts instead of throwaway responses
+- **Reusable handoffs** - Future agents can continue the work without you repeating yourself and without them wandering around searching for clues
+- **Verifiable intent** - The structure forces agents to declare what they'll build before they build it—you catch misunderstandings early
 
-Same time investment: disposable chat log vs permanently useful output.
+Same time investment: disposable chat log vs steerable, resumable work.
 
 ## Further reading
 

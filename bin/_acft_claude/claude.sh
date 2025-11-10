@@ -24,7 +24,7 @@ fi
 
 # Run prelaunch hook if configured
 if [ -n "$ACFT_CLAUDE_PRELAUNCH_HOOK" ]; then
-  # echo "Running prelaunch hook: $ACFT_CLAUDE_PRELAUNCH_HOOK" >&2
+  echo "Running prelaunch hook: $ACFT_CLAUDE_PRELAUNCH_HOOK" >&2
   eval "$ACFT_CLAUDE_PRELAUNCH_HOOK"
   hook_exit_code=$?
   if [ $hook_exit_code -ne 0 ]; then

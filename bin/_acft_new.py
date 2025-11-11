@@ -45,7 +45,10 @@ def run(args: argparse.Namespace, ctx: AcftContext) -> int:
         raise AcftError(
             "Checkpoint names must follow {branch}_v{version}_{step} (e.g., auth_v1_01)."
         )
-    target_dir = ctx.work_root / name
+    # If we're inside a checkpoint, create the new checkpoint as a child (delegate).
+    # Otherwise, create it at work_root level (top-level checkpoint).
+    parent_dir = ctx.checkpoint_root if ctx.checkpoint_root else ctx.work_root
+    target_dir = parent_dir / name
     if target_dir.exists():
         raise AcftError(f"Checkpoint directory already exists: {target_dir}")
 

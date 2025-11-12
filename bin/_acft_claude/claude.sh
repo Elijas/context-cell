@@ -72,6 +72,9 @@ OPTIONS:
   Framework Prompt:
   -n, --disable-framework        Disable ACFT framework features
 
+  Settings:
+  --merge-settings JSON          Merge additional settings (deep merges with base settings)
+
   Other Claude Flags:
   All other flags (e.g., --continue, --resume, --fork-session) are passed through to Claude
 
@@ -111,6 +114,7 @@ thinking="true"
 window_title=""
 passthrough_args=()  # Arguments to pass through to Claude
 append_mode="enabled"
+merge_settings_json=""  # Additional settings to merge
 
 # Expand combined single-letter flags (e.g., -st becomes -s -t)
 expanded_args=()
@@ -200,6 +204,15 @@ while [[ $# -gt 0 ]]; do
     -n|--disable-framework)
       append_mode="disabled"
       shift
+      ;;
+    --merge-settings)
+      if [[ -n $2 && $2 != -* ]]; then
+        merge_settings_json="$2"
+        shift 2
+      else
+        echo "Error: --merge-settings requires a JSON argument" >&2
+        exit 1
+      fi
       ;;
     --window-title)
       if [[ -n $2 && $2 != -* ]]; then
@@ -306,6 +319,36 @@ elif [ "$has_thinking" = true ]; then
 elif [ "$has_hooks" = true ]; then
   sessionstart_hook_path="$SCRIPT_DIR/sessionstart-context.sh"
   settings_json="{\"hooks\":{\"SessionStart\":[{\"hooks\":[{\"type\":\"command\",\"command\":\"$sessionstart_hook_path\"}]}]}}"
+fi
+
+# Merge additional settings if provided
+if [ -n "$merge_settings_json" ]; then
+  if command -v jq >/dev/null 2>&1; then
+    if [ -n "$settings_json" ]; then
+      # Deep merge: base settings + additional settings
+      settings_json=$(echo "$settings_json" "$merge_settings_json" | jq -s '
+        def deep_merge:
+          reduce .[] as $item ({};
+            . * $item |
+            to_entries |
+            group_by(.key) |
+            map(
+              if (.[0].value | type) == "object" and (length > 1) and ((.[1].value | type) == "object")
+              then {key: .[0].key, value: ([.[].value] | deep_merge)}
+              else .[-1]
+              end
+            ) |
+            from_entries
+          );
+        deep_merge
+      ')
+    else
+      # No base settings, just use the merge settings
+      settings_json="$merge_settings_json"
+    fi
+  else
+    echo "Warning: jq not installed, cannot merge settings. Using base settings only." >&2
+  fi
 fi
 
 # Add combined settings if we have any

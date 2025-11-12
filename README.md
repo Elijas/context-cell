@@ -18,6 +18,18 @@ Human: "no, that's not what I wanted"
 
 Wasted tokens. Wasted time. Agents can't be redirected cheaply because they don't declare intent upfront—they just execute and hope you'll approve afterward.
 
+## Why checkpoints fix this (three ways)
+
+Agents fail because they can't manage context:
+
+1. **Can't resume cleanly** - Come back tomorrow, agent has forgotten everything. You re-explain or it re-reads thousands of lines trying to reconstruct state.
+
+2. **Context explodes during execution** - Long task → 50k tokens → agent loses the plot, starts contradicting itself, forgets original requirements.
+
+3. **Humans can't verify efficiently** - No structured interface to review "what will you do" before execution, or "what did you do" after.
+
+Checkpoints solve all three: structured state snapshots that bound context, enable resumption, and make verification cheap.
+
 ## The solution
 
 **Checkpoints**: agents declare what they'll build before building it.
@@ -40,11 +52,11 @@ This optimizes **human verification throughput**, not agent speed. The constrain
 - **Audit decisions**: When something breaks, LOG shows what the agent was thinking
 - **Supervise at scale**: Each checkpoint is self-contained—review multiple agents without context-switching hell
 
-> **Side effect**: Building primitives for human supervision (state snapshots, dependency tracking, audit trails) accidentally enabled autonomous agent coordination. We solved context management; got DAG execution for free.
+The same primitives that enable human supervision (state snapshots, dependency tracking, audit trails) also enable autonomous multi-agent coordination. Solve context management, get DAG execution for free.
 
 ## Alternative perspectives on ACF
 
-The supervision model scales beyond single-agent tasks. **If you think in terms of...**
+These three purposes (resumption, context boundaries, verification) map to familiar workflows. **If you think in terms of...**
 
 **Git workflow for agent work**
 - Checkpoints = commits (discrete units of work)

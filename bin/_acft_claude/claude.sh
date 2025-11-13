@@ -14,24 +14,6 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd -P)"
 
-# Load optional .env file from the same directory
-# Note: Variables already set in the environment will be preserved
-if [ -f "$SCRIPT_DIR/.env" ]; then
-  set -a  # Automatically export all variables
-  source "$SCRIPT_DIR/.env"
-  set +a
-fi
-
-# Run prelaunch hook if configured
-if [ -n "$ACFT_CLAUDE_PRELAUNCH_HOOK" ]; then
-  echo "Running prelaunch hook: $ACFT_CLAUDE_PRELAUNCH_HOOK" >&2
-  eval "$ACFT_CLAUDE_PRELAUNCH_HOOK"
-  hook_exit_code=$?
-  if [ $hook_exit_code -ne 0 ]; then
-    echo "Error: Prelaunch hook failed with exit code $hook_exit_code" >&2
-    exit 1
-  fi
-fi
 
 # Determine the command name for help text
 # Uses ACFT_PARENT_CMD env var if set, otherwise falls back to script name
@@ -95,10 +77,6 @@ NOTES:
   - All non-option arguments are automatically joined into a single prompt
   - Quotes are optional: "foo bar" and foo bar both work
   - Unknown flags are passed through to Claude CLI
-
-CONFIGURATION:
-  - ACFT_CLAUDE_PRELAUNCH_HOOK: Run a command before launching Claude
-    Example: export ACFT_CLAUDE_PRELAUNCH_HOOK="echo 'Launching Claude...'"
 EOF
   exit 0
 }

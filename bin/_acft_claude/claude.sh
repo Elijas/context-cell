@@ -55,6 +55,8 @@ OPTIONS:
   Window Options:
   -w, --window                   Open in new Ghostty window
   --window-title TITLE           Open in new window with specified title
+  --working-directory PATH       Launch in specified directory (auto-calculates window title)
+                                 Supports both absolute (/path/to/dir) and relative (./dir) paths
 
   Framework Prompt:
   -n, --disable-framework        Disable ACFT framework features
@@ -70,6 +72,8 @@ EXAMPLES:
   ${CMD_NAME} -h -w                      # Launch Haiku in new window
   ${CMD_NAME} -st                        # Launch Sonnet with thinking (combined flags)
   ${CMD_NAME} --window-title "My Project"  # Launch in titled window
+  ${CMD_NAME} --working-directory ./src  # Launch in ./src directory with auto-calculated title
+  ${CMD_NAME} --working-directory /path/to/project  # Launch in absolute path
   ${CMD_NAME} --with-permission-checks   # Launch with permission checks enabled
   ${CMD_NAME} how are you                # Multiple words automatically joined into single prompt
   ${CMD_NAME} --print "what is 2+2?"     # Non-interactive mode
@@ -95,6 +99,7 @@ dangerously=true
 model="sonnet"
 thinking="true"
 window_title=""
+working_directory=""
 passthrough_args=()  # Arguments to pass through to Claude
 append_mode="enabled"
 merge_settings_json=""  # Additional settings to merge
@@ -207,6 +212,15 @@ while [[ $# -gt 0 ]]; do
         exit 1
       fi
       ;;
+    --working-directory)
+      if [[ -n $2 && $2 != -* ]]; then
+        working_directory="$2"
+        shift 2
+      else
+        echo "Error: --working-directory requires an argument" >&2
+        exit 1
+      fi
+      ;;
     -*)
       # Unknown flag - pass through to Claude
       passthrough_args+=("$1")
@@ -218,6 +232,38 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+# Process working directory if provided
+if [ -n "$working_directory" ]; then
+  # Resolve to absolute path (handles both relative and absolute paths)
+  if [[ "$working_directory" != /* ]]; then
+    # Relative path - resolve it
+    working_directory="$(cd "$working_directory" 2>/dev/null && pwd -P)"
+    if [ $? -ne 0 ]; then
+      echo "Error: Cannot access directory: $2" >&2
+      exit 1
+    fi
+  else
+    # Absolute path - verify it exists
+    if [ ! -d "$working_directory" ]; then
+      echo "Error: Directory does not exist: $working_directory" >&2
+      exit 1
+    fi
+    # Resolve symlinks
+    working_directory="$(cd "$working_directory" 2>/dev/null && pwd -P)"
+  fi
+
+  # Auto-calculate window title if not explicitly set
+  if [ -z "$window_title" ]; then
+    # Extract the last directory name and its parent
+    dir_name="$(basename "$working_directory")"
+    parent_name="$(basename "$(dirname "$working_directory")")"
+    window_title="${parent_name}/${dir_name}"
+  fi
+
+  # Enable new window mode
+  open_new_window=true
+fi
 
 # Determine whether we should append the framework specification prompt
 # Default is enabled; only disabled if -n flag is used
@@ -378,7 +424,9 @@ if [ "$open_new_window" = true ]; then
   claude_cmd="$claude_cmd; exec \\$SHELL"
 
   # Build Ghostty arguments
-  ghostty_args=("--working-directory=$PWD")
+  # Use working_directory if provided, otherwise use current directory
+  target_dir="${working_directory:-$PWD}"
+  ghostty_args=("--working-directory=$target_dir")
   if [ -n "$window_title" ]; then
     ghostty_args+=("--title=$window_title")
   fi

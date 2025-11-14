@@ -3,6 +3,11 @@
 # Claude Launcher
 # A wrapper script for launching Claude CLI with various configurations
 
+# Feature flag: verbose session start context
+# Set ACFT_VERBOSE_SESSIONSTART=true to print full session context
+# Default is false (prints simple launch message)
+VERBOSE_SESSIONSTART="${ACFT_VERBOSE_SESSIONSTART:-false}"
+
 # Ensure acft command is available
 if ! command -v acft >/dev/null 2>&1; then
   echo "Error: 'acft' command not found in PATH" >&2
@@ -346,7 +351,11 @@ fi
 
 # Handle remaining arguments
 if [ "$print_roots" = true ]; then
-  "$SCRIPT_DIR/sessionstart-context.sh" --short
+  if [ "$VERBOSE_SESSIONSTART" = true ]; then
+    "$SCRIPT_DIR/sessionstart-context.sh" --short
+  else
+    echo "Launching Claude with ACF integration enabled..."
+  fi
 fi
 
 if [ "$open_new_window" = true ]; then

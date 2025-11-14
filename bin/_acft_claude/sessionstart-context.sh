@@ -16,9 +16,9 @@ else
   COMMANDS+=("acft expand ::PROJECT ::WORK")
 fi
 
-# 2. Quick orientation view (executive summary from ACF framework)
+# 2. Full checkpoint file (complete context for the current checkpoint)
 if [ -f "CHECKPOINT.md" ]; then
-  COMMANDS+=("acft orient ::THIS --sections STATUS,HARNESS")
+  COMMANDS+=("cat \$(acft expand ::THIS)/CHECKPOINT.md")
 fi
 
 # 3. Child CHECKPOINT status summary (critical for coordinators)
